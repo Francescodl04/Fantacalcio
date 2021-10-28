@@ -1,0 +1,14 @@
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.csproj.AssemblyReference.cache
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.AssemblyInfoInputs.cache
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.AssemblyInfo.cs
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.csproj.CoreCompileInputs.cache
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\bin\Debug\netcoreapp3.1\Fantacalcio.exe
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\bin\Debug\netcoreapp3.1\Fantacalcio.deps.json
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\bin\Debug\netcoreapp3.1\Fantacalcio.runtimeconfig.json
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\bin\Debug\netcoreapp3.1\Fantacalcio.runtimeconfig.dev.json
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\bin\Debug\netcoreapp3.1\Fantacalcio.dll
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\bin\Debug\netcoreapp3.1\Fantacalcio.pdb
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.dll
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.pdb
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.genruntimeconfig.cache
