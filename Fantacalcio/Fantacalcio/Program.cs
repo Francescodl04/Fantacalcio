@@ -1,4 +1,10 @@
-﻿using System;
+﻿/* Autore: Francesco Di Lena
+ * Classe: 4F
+ * Consegna: Progettare un sistema di gestione del Fantacalcio.
+ */
+
+
+using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IO;
@@ -22,8 +28,11 @@ namespace Fantacalcio
         static void Main(string[] args)
         {
             Console.Title = "Programma Gestionale del Fantacalcio";
-            OperazioniFile operazioniFile = new OperazioniFile(@"", "");
-            verifica = operazioniFile.VerificaEsistenzaFile();
+            for (int i = 0; i < 2; i++)
+            {
+                OperazioniFile operazioniFile = new OperazioniFile(percorsiIO[i], "");
+                verifica = operazioniFile.VerificaEsistenzaFile();
+            }
             VisualizzaIntestazione();
             if (verifica == false)
             {
@@ -267,12 +276,48 @@ namespace Fantacalcio
             }
         }
 
-        static private void SchermataSchieramentoCampoFantaCalciatori()
+        static private void SchermataRicercaFantaCalciatori()
         {
-
+            string[] testoDaVisualizzare = new string[] { "il nome", "il cognome", "la squadra", "il ruolo", "il numero di maglia", "la quotazione iniziale", "la quotazione attuale", "il punteggio in classifica"};
+            string[] giocatoreRicercato = new string[] { "", "", "", "", "0", "0", "0", "0" };
+            Console.Clear();
+            VisualizzaIntestazione();
+            Console.WriteLine("                        Funzionalità di ricerca dei fanta-calciatori                       ");
+            int contatoreFiltri = 0;
+            for (int i = 0; i < testoDaVisualizzare.Length; i++)
+            {
+                SetResetColori(true);
+                Console.WriteLine($"\nInserisci {testoDaVisualizzare[i]} del fanta-calciatore che vuoi cercare:");
+                SetResetColori(false);
+                giocatoreRicercato[i] = Console.ReadLine();
+                if (giocatoreRicercato[i] == "")
+                {
+                    break;
+                }
+                else
+                {
+                    contatoreFiltri++;   
+                }
+            }
+            FantaCalciatore = new FantaCalciatore(giocatoreRicercato[0], giocatoreRicercato[1], giocatoreRicercato[2], giocatoreRicercato[3], int.Parse(giocatoreRicercato[4]), int.Parse(giocatoreRicercato[5]), int.Parse(giocatoreRicercato[6]), int.Parse(giocatoreRicercato[7]), 0);
+            List<FantaCalciatore> FantaCalciatoriTrovati = FantaCalciatore.RicercaFantaCalciatore(FantaCalciatori, contatoreFiltri);
+            SetResetColori(true);
+            if (FantaCalciatoriTrovati.Count == 0) 
+            {
+                Console.WriteLine("\nLa ricerca non ha prodotto risultati...");
+            }
+            else if (FantaCalciatoriTrovati.Count == 1)
+            {
+                Console.WriteLine("\nLa ricerca ha prodotto un risultato...");
+            }
+            else
+            {
+                Console.WriteLine($"\nLa ricerca ha prodotto {FantaCalciatoriTrovati.Count} risultati...");
+            }
+            SetResetColori(false);
         }
 
-        static private void SchermataRicercaFantaCalciatori()
+        static private void SchermataSchieramentoCampoFantaCalciatori()
         {
 
         }
@@ -329,7 +374,7 @@ namespace Fantacalcio
         {
             try
             {
-                File.ReadAllLines(percorsoIO);
+                string contenutoInput = File.ReadAllText(percorsoIO);
             }
             catch(UnauthorizedAccessException)
             {
@@ -354,6 +399,10 @@ namespace Fantacalcio
             {
                 GestisciErrori(1);
             }
+        }
+        public void EliminaFile()
+        {
+            File.Delete(percorsoIO);
         }
         public void GestisciErrori(int codiceErrore)
         {
@@ -445,9 +494,41 @@ namespace Fantacalcio
             return FantaCalciatori;
         }
 
-        public void RicercaFantaCalciatore()
+        public List<FantaCalciatore> RicercaFantaCalciatore(List<FantaCalciatore> FantaCalciatori, int contatoreFiltri)
         {
-
+            var caratteristicheRicercate = new dynamic[] { nome, cognome, squadra, ruolo, numeroMaglia, quotazioneIniziale, quotazioneAttuale, punteggioClassifica };
+            List<FantaCalciatore> FantaCalciatoriBis = FantaCalciatori;
+            for (int i = 0; i < contatoreFiltri; i++)
+            {
+                switch(i)
+                {
+                    case (0):
+                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.nome.Contains(nome));
+                        break;
+                    case (1):
+                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.cognome.Contains(cognome));
+                        break;
+                    case (2):
+                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.squadra.Contains(squadra));
+                        break;
+                    case (3):
+                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.ruolo.Contains(ruolo));
+                        break;
+                    case (4):
+                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.numeroMaglia == numeroMaglia);
+                        break;
+                    case (5):
+                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.quotazioneIniziale == quotazioneIniziale);
+                        break;
+                    case (6):
+                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.quotazioneAttuale == quotazioneAttuale);
+                        break;
+                    case (7):
+                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.punteggioClassifica == punteggioClassifica);
+                        break;
+                }
+            }
+            return FantaCalciatoriBis;
         }
 
         public void AggiornaStatisticheFantaCalciatore()
