@@ -119,17 +119,17 @@ namespace Fantacalcio
                              $"                   Il tuo ultimo accesso risale alle ore 11:24 del 07/11/2021.             \n" +
                               " Scegli una delle seguenti funzioni inserendo il corrispondente valore numerico per iniziare... ");
             SetResetColori(true);
-            Console.WriteLine("\n                                                                                                   ");
+            Console.WriteLine("\n                                    =========================                                      ");
             SetResetColori(false);
             Console.WriteLine("\n1) Esegui la ricerca dei fanta-calciatori\n" +
-                              "2) Visualizza lo schieramento in campo attuale\n" +
+                              "2) Visualizza/crea lo schieramento in campo attuale\n" +
                               "3) Aggiorna le statistiche dei fanta-calciatori\n" +
                               $"4) Visualizza la classifica parziale del torneo di fanta-{torneo}\n" +
                               "5) Ripristina le impostazioni iniziali\n" +
                               "6) Leggi i comandi\n" +
                               "7) Esci dal programma");
             SetResetColori(true);
-            Console.WriteLine("\n                                                                                                   ");
+            Console.WriteLine("\n                                    =========================                                      ");
             do
             {
                 SetResetColori(false);
@@ -496,41 +496,46 @@ namespace Fantacalcio
 
         public List<FantaCalciatore> RicercaFantaCalciatore(List<FantaCalciatore> FantaCalciatori, int contatoreFiltri)
         {
-            var caratteristicheRicercate = new dynamic[] { nome, cognome, squadra, ruolo, numeroMaglia, quotazioneIniziale, quotazioneAttuale, punteggioClassifica };
-            List<FantaCalciatore> FantaCalciatoriBis = FantaCalciatori;
+            List<FantaCalciatore> FantaCalciatoriTrovati = FantaCalciatori;
             for (int i = 0; i < contatoreFiltri; i++)
             {
-                switch(i)
-                {
-                    case (0):
-                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.nome.Contains(nome));
-                        break;
-                    case (1):
-                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.cognome.Contains(cognome));
-                        break;
-                    case (2):
-                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.squadra.Contains(squadra));
-                        break;
-                    case (3):
-                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.ruolo.Contains(ruolo));
-                        break;
-                    case (4):
-                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.numeroMaglia == numeroMaglia);
-                        break;
-                    case (5):
-                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.quotazioneIniziale == quotazioneIniziale);
-                        break;
-                    case (6):
-                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.quotazioneAttuale == quotazioneAttuale);
-                        break;
-                    case (7):
-                        FantaCalciatoriBis = FantaCalciatoriBis.FindAll(FantaCalciatoriBis => FantaCalciatoriBis.punteggioClassifica == punteggioClassifica);
-                        break;
-                }
+                FantaCalciatoriTrovati = FantaCalciatoriTrovati.FindAll(CreaPredicato(i));
             }
-            return FantaCalciatoriBis;
+            return FantaCalciatoriTrovati;
         }
 
+        Predicate<FantaCalciatore> CreaPredicato(int i)
+        {
+            Predicate<FantaCalciatore> predicato = null;
+            switch (i)
+            {
+                case (0):
+                    predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.nome.Contains(nome);
+                    break;
+                case (1):
+                    predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.cognome.Contains(cognome);
+                    break;
+                case (2):
+                    predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.squadra.Contains(squadra);
+                    break;
+                case (3):
+                    predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.ruolo.Contains(ruolo);
+                    break;
+                case (4):
+                    predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.numeroMaglia == numeroMaglia;
+                    break;
+                case (5):
+                    predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.quotazioneIniziale == quotazioneIniziale;
+                    break;
+                case (6):
+                    predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.quotazioneAttuale == quotazioneAttuale;
+                    break;
+                case (7):
+                    predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.punteggioClassifica == punteggioClassifica;
+                    break;
+            }
+            return predicato;
+        }
         public void AggiornaStatisticheFantaCalciatore()
         {
 
