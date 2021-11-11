@@ -12,3 +12,5 @@ C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S.
 C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.dll
 C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.pdb
 C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.genruntimeconfig.cache
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+C:\Users\Famiglia Di Lena\Documents\Scuola\Secondaria di Secondo Grado\IV F A.S. 2021-2022\Informatica\Fantacalcio\Fantacalcio\Fantacalcio\obj\Debug\netcoreapp3.1\Fantacalcio.csproj.CopyComplete
