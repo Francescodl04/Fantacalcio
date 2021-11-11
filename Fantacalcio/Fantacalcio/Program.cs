@@ -18,8 +18,10 @@ namespace Fantacalcio
 
     class Programma //La classe Programma è la prima ad essere richiamata dal programma al suo avvio e contiene la visualizzazione a schermo di testo, oltre alle richieste di inserimento rivolte all'utente. 
     {
-        static FantaAllenatore FantaAllenatore;
-        static FantaCalciatore FantaCalciatore;
+        //Variabili necessarie per il programma.
+
+        static FantaAllenatore FantaAllenatore; //Inizializza la classe FantaAllenatore.
+        static FantaCalciatore FantaCalciatore;//Inizializza la classe FantaCalciatore.
         static string ruolo, torneo;
         static string[] percorsiIO = new string[] { @"C:\Programma Gestionale Fantacalcio\fanta-allenatori.json", @"C:\Programma Gestionale Fantacalcio\fanta-calciatori.json", @"C:\Programma Gestionale Fantacalcio\schieramenti.json" };
         static string percorsoCartella = @"C:\Programma Gestionale Fantacalcio";
@@ -27,7 +29,7 @@ namespace Fantacalcio
         static List<FantaCalciatore> FantaCalciatori = new List<FantaCalciatore>();
         static List<int> indici = new List<int>();
 
-        static void Main()
+        static void Main() //Metodo principale, il primo che viene richiamato dal programma, che stabilisce quali metodi invocare in base al fatto che si tratti di un avvio comune oppure il primo. 
         {
             bool chiusuraProgramma;
             bool[] verificaFile = new bool[2];
@@ -72,9 +74,9 @@ namespace Fantacalcio
             Console.ReadKey();
             Environment.Exit(0);
 
-        }
+        } 
 
-        static private void VisualizzaIntestazione()
+        static private void VisualizzaIntestazione() //Metodo che permette la visualizzazione dell'intestazione "Programma gestionale del Fantacalcio" in ogni schermata. 
         {
             SetResetColori(true);
             Console.WriteLine("                                       _________          ________                                 " +
@@ -87,7 +89,7 @@ namespace Fantacalcio
             SetResetColori(false);
         }
 
-        static public void PrimoAvvio()
+        static public void PrimoAvvio() //Metodo richiamato dal Main solamente quando il programma viene avviato per la prima volta. Contiene le visualizzazioni video e le prime richieste di inserimento per l'utente. 
         {
             bool verifica;
             Console.WriteLine("                      Benvenuto nel programma gestionale del fantacalcio.                      \n"
@@ -139,7 +141,7 @@ namespace Fantacalcio
             SchermataInserimentoRose();
         }
 
-        static private void SchermataInserimentoRose()
+        static private void SchermataInserimentoRose() //Metodo che viene richiamato solo da PrimoAvvio e che contiene la visualizzazione video delle richieste che permettono all'utente l'inserimento delle rose dei fanta-allenatori. 
         {
             bool verifica = false;
             string[] caratteristicheInserite;
@@ -235,7 +237,7 @@ namespace Fantacalcio
             }
         }
 
-        static private bool AvvioComune()
+        static private bool AvvioComune() //Metodo richiamato quando i dati iniziali sono stati configurati. Permette la visualizzazione di un menu di scelta tra le diverse funzionalità del programma. 
         {
             bool chiusuraProgramma = false;
             bool verifica;
@@ -287,7 +289,7 @@ namespace Fantacalcio
             return chiusuraProgramma;
         }
 
-        static private void SchermataRicercaFantaCalciatori()
+        static private void SchermataRicercaFantaCalciatori() //Metodo che permette di visualizzare la prima parte della schermata di ricerca dei fanta-calciatori. 
         {
             Console.Clear();
             VisualizzaIntestazione();
@@ -295,7 +297,7 @@ namespace Fantacalcio
             Ricerca();
         }
 
-        static private void SchermataSchieramentoCampoFantaCalciatori()
+        static private void SchermataSchieramentoCampoFantaCalciatori() //Metodo che permette di visualizzare la prima parte della schermata di ricerca dei fanta-calciatori e poi l'inserimento di ogni giocatore in uno schieramento
         {
             Console.Clear();
             VisualizzaIntestazione();
@@ -350,7 +352,7 @@ namespace Fantacalcio
             Console.WriteLine("            Funzionalità di aggiornamento delle statistiche dei fanta-calciatori            ");
         }
 
-        static private void Ricerca()
+        static private void Ricerca() //Metodo che permette di visualizzare le richieste dei filtri di ricerca, ma anche i risultati della ricerca. 
         {
             string[] testoDaVisualizzare = new string[] { "il nome", "il cognome", "la squadra", "il ruolo", "il numero di maglia", "la quotazione iniziale", "la quotazione attuale", "il punteggio in classifica" };
             string[] giocatoreRicercato = new string[] { "", "", "", "", "0", "0", "0", "0" };
@@ -416,7 +418,7 @@ namespace Fantacalcio
             Console.WriteLine("            Funzionalità di visualizzazione della classifica dei fanta-calciatori            ");
         }
 
-        static private bool SchermataCancellazioneDati()
+        static private bool SchermataCancellazioneDati() //Metodo che visualizza le richieste a video che poi porteranno o meno alla cancellazione dei dati del fanta-torneo. 
         {
             bool verifica = false;
             bool chiusuraProgramma = false;
@@ -458,7 +460,7 @@ namespace Fantacalcio
             return chiusuraProgramma;
         }
 
-        static public void SetResetColori(bool controllo)
+        static public void SetResetColori(bool controllo) //Metodo che permette di cambiare i colori dei caratteri e dello sfondo, oppure di farli tornare standard. 
         {
             if (controllo == true)
             {
@@ -479,10 +481,12 @@ namespace Fantacalcio
         {
             
         }
+
         public bool VerificaEsistenzaFile(string percorsoIO)
         {
             return File.Exists(percorsoIO);
         }
+
         public void CreaDirectory(string percorsoIO)
         {
             try
@@ -498,6 +502,7 @@ namespace Fantacalcio
                 GestisciErrori(1);
             }
         }
+
         public string LeggiFile(string percorsoIO)
         {
             string contenutoInput = "";
