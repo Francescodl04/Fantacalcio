@@ -5,11 +5,11 @@
 
 //Direttive using standard.
 using System; //Spazio dei nomi che permette l'uso dei metodi più comuni.
-using System.Threading.Tasks; //Spazio dei nomi che permette la posticipazione delle istruzioni.
 using System.IO; //Spazio dei nomi che permette la gestione dei file in generale.
 using System.Collections.Generic; //Spazio dei nomi che permette la gestione delle liste.
 //Direttive using aggiuntive (NuGet).
 using Newtonsoft.Json; //Spazio dei nomi che permette la gestione dei file json.
+using System.Runtime.Serialization;
 
 
 namespace Fantacalcio
@@ -20,14 +20,12 @@ namespace Fantacalcio
     {
         //Variabili necessarie per il programma.
 
-        static FantaAllenatore FantaAllenatore; //Inizializza la classe FantaAllenatore.
-        static FantaCalciatore FantaCalciatore;//Inizializza la classe FantaCalciatore.
-        static string ruolo, torneo;
-        static string[] percorsiIO = new string[] { @"C:\Programma Gestionale Fantacalcio\fanta-allenatori.json", @"C:\Programma Gestionale Fantacalcio\fanta-calciatori.json", @"C:\Programma Gestionale Fantacalcio\schieramenti.json" };
-        static string percorsoCartella = @"C:\Programma Gestionale Fantacalcio";
-        static List<FantaAllenatore> FantaAllenatori = new List<FantaAllenatore>();
-        static List<FantaCalciatore> FantaCalciatori = new List<FantaCalciatore>();
-        static List<int> indici = new List<int>();
+        private static readonly string[] percorsiIO = new string[] { @"C:\Programma Gestionale Fantacalcio\fanta-allenatori.json", @"C:\Programma Gestionale Fantacalcio\fanta-calciatori.json", @"C:\Programma Gestionale Fantacalcio\schieramenti.json" };
+        private static readonly string percorsoCartella = @"C:\Programma Gestionale Fantacalcio";
+        static private List<FantaAllenatore> FantaAllenatori = new List<FantaAllenatore>();
+        static private List<FantaCalciatore> FantaCalciatori = new List<FantaCalciatore>();
+        static private List<int> Indici = new List<int>();
+        static private List<(int, int)> CodiciSchieramenti = new List<(int, int)>();
 
         static void Main() //Metodo principale, il primo che viene richiamato dal programma, che stabilisce quali metodi invocare in base al fatto che si tratti di un avvio comune oppure il primo. 
         {
@@ -42,10 +40,9 @@ namespace Fantacalcio
                     OperazioniFile operazioniFile = new OperazioniFile();
                     verificaFile[i] = operazioniFile.VerificaEsistenzaFile(percorsiIO[i]);
                 }
-                VisualizzaIntestazione();
                 if (verificaFile[0] == false || verificaFile[1] == false)
                 {
-                    var fantacalcio = FantaAllenatore;
+                    VisualizzaIntestazione();
                     OperazioniFile operazioniFile = new OperazioniFile();
                     operazioniFile.CreaDirectory(percorsoCartella);
                     PrimoAvvio();
@@ -63,6 +60,7 @@ namespace Fantacalcio
                         FantaCalciatori = JsonConvert.DeserializeObject<List<FantaCalciatore>>(contenutoInput);
                     }
                 }
+                VisualizzaIntestazione();
                 chiusuraProgramma = AvvioComune();
                 if (chiusuraProgramma == false)
                 {
@@ -74,7 +72,7 @@ namespace Fantacalcio
             Console.ReadKey();
             Environment.Exit(0);
 
-        } 
+        }
 
         static private void VisualizzaIntestazione() //Metodo che permette la visualizzazione dell'intestazione "Programma gestionale del Fantacalcio" in ogni schermata. 
         {
@@ -99,7 +97,7 @@ namespace Fantacalcio
             SetResetColori(true);
             Console.WriteLine("Inserisci il torneo reale di riferimento per il gioco:");
             SetResetColori(false);
-            torneo = Console.ReadLine();
+            string torneo = Console.ReadLine();
             int numeroFantaAllenatori;
             do
             {
@@ -144,6 +142,7 @@ namespace Fantacalcio
         static private void SchermataInserimentoRose() //Metodo che viene richiamato solo da PrimoAvvio e che contiene la visualizzazione video delle richieste che permettono all'utente l'inserimento delle rose dei fanta-allenatori. 
         {
             bool verifica = false;
+            string ruolo;
             string[] caratteristicheInserite;
             VisualizzaIntestazione();
             Console.WriteLine("\nBene, ora che sono stati inseriti i dati principali dei fanta-allenatori, è necessario  " +
@@ -169,15 +168,15 @@ namespace Fantacalcio
                         ruolo = "Attaccante";
                     }
                     SetResetColori(true);
-                    Console.WriteLine($"\n{FantaAllenatori[i].nome}, inserisci il nome, il cognome, la squadra, il numero di maglia, la quotazione iniziale\ne il punteggio in classifica (separati da una virgola) del tuo {j + 1}° fanta-giocatore ({ruolo}):");
+                    Console.WriteLine($"\n{FantaAllenatori[i].OttieniNome()}, inserisci il nome, il cognome, la squadra, il numero di maglia e la quotazione iniziale\n(separati da una virgola) del tuo {j + 1}° fanta-giocatore ({ruolo}):");
                     SetResetColori(false);
                     do
                     {
                         string informazioniInserite = Console.ReadLine();
                         caratteristicheInserite = informazioniInserite.Trim(' ').Split(',');
-                        if (caratteristicheInserite.Length != 6)
+                        if (caratteristicheInserite.Length != 5)
                         {
-                            Console.WriteLine("\nNon hai inserito abbastanza caratteristiche, quindi reinserisci il fanta-calciatore:");
+                            Console.WriteLine("\nNon hai inserito il giusto numero caratteristiche, quindi reinserisci il fanta-calciatore:");
                             verifica = false;
                         }
                         else
@@ -194,26 +193,25 @@ namespace Fantacalcio
                         }
                     }
                     while (verifica == false);
-                    FantaCalciatore = new FantaCalciatore(caratteristicheInserite[0], caratteristicheInserite[1], caratteristicheInserite[2], ruolo, int.Parse(caratteristicheInserite[3]), int.Parse(caratteristicheInserite[4]), int.Parse(caratteristicheInserite[5]), 0, i);
-                    FantaCalciatori = FantaCalciatore.AggiungiFantaCalciatore(FantaCalciatori);
+                    FantaCalciatore fantaCalciatore = new FantaCalciatore(caratteristicheInserite[0], caratteristicheInserite[1], caratteristicheInserite[2], ruolo, int.Parse(caratteristicheInserite[3]), int.Parse(caratteristicheInserite[4]), 0, 0, i);
+                    FantaCalciatori = fantaCalciatore.AggiungiFantaCalciatore(FantaCalciatori);
                 }
             }
             for (int i = 0; i < FantaAllenatori.Count; i++)
             {
-                Console.WriteLine($"Questo è l'elenco del fanta-calciatori di {FantaAllenatori[i].nome}:");
+                Console.WriteLine($"\nQuesto è l'elenco del fanta-calciatori di {FantaAllenatori[i].OttieniNome()}:");
                 for (int j = 0; j < FantaCalciatori.Count / FantaAllenatori.Count; j++)
                 {
-                    Console.WriteLine($"{j + 1}) {string.Join(' ', FantaCalciatori[i])}");
+                    Console.WriteLine($"{j + 1}) {string.Join(' ', FantaCalciatori[j])}");
                 }
-                if (i != FantaCalciatori.Count - 1)
+                if (i != FantaAllenatori.Count - 1)
                 {
                     Console.WriteLine("\nPer passare alla rosa del prossimo fanta-allenatore, premi un tasto qualsiasi...");
                     Console.ReadKey();
                 }
             }
             Console.WriteLine("\nSei sicuro di voler salvare le rose dei Fanta-Allenatori? (inserisci \"S\" per salvare, oppure \"N\" per rifare l'inserimento delle rose dei fanta-calciatori)");
-            string confermaSalvataggio = Console.ReadLine().ToUpper();
-            switch (confermaSalvataggio)
+            switch (RispostaSalvataggio())
             {
                 case ("S"):
                     Console.WriteLine("\nSalvataggio in corso...");
@@ -235,6 +233,7 @@ namespace Fantacalcio
                 case ("N"):
                     break;
             }
+            Console.Clear();
         }
 
         static private bool AvvioComune() //Metodo richiamato quando i dati iniziali sono stati configurati. Permette la visualizzazione di un menu di scelta tra le diverse funzionalità del programma. 
@@ -247,11 +246,12 @@ namespace Fantacalcio
             Console.WriteLine("\n                                    =========================                                      ");
             SetResetColori(false);
             Console.WriteLine("\n1) Esegui la ricerca dei fanta-calciatori\n" +
-                              "2) Visualizza/crea lo schieramento in campo attuale\n" +
-                              "3) Aggiorna le statistiche dei fanta-calciatori\n" +
-                              $"4) Visualizza la classifica parziale del torneo di fanta-{torneo}\n" +
-                              "5) Ripristina le impostazioni iniziali\n" +
-                              "6) Esci dal programma");
+                              "2) Visualizza i dati dei fanta-allenatori\n" +
+                              "3) Visualizza/crea lo schieramento in campo attuale\n" +
+                              "4) Aggiorna le statistiche dei fanta-calciatori\n" +
+                              $"5) Visualizza la classifica parziale del torneo di fanta-torneo\n" +
+                              "6) Ripristina le impostazioni iniziali\n" +
+                              "7) Esci dal programma");
             SetResetColori(true);
             Console.WriteLine("\n                                    =========================                                      ");
             do
@@ -265,18 +265,21 @@ namespace Fantacalcio
                         SchermataRicercaFantaCalciatori();
                         break;
                     case ('2'):
-                        SchermataSchieramentoCampoFantaCalciatori();
+                        SchermataVisualizzazioneFantaAllenatori();
                         break;
                     case ('3'):
-                        SchermataAggiornamentoStatisticheFantaCalciatori();
+                        SchermataSchieramentoCampoFantaCalciatori();
                         break;
                     case ('4'):
-                        SchermataVisualizzazioneClassifiche();
+                        SchermataAggiornamentoStatisticheFantaCalciatori();
                         break;
                     case ('5'):
-                        chiusuraProgramma = SchermataCancellazioneDati();
+                        SchermataVisualizzazioneClassifiche();
                         break;
                     case ('6'):
+                        chiusuraProgramma = SchermataCancellazioneDati();
+                        break;
+                    case ('7'):
                         chiusuraProgramma = true;
                         break;
                     default:
@@ -297,6 +300,18 @@ namespace Fantacalcio
             Ricerca();
         }
 
+        static public void SchermataVisualizzazioneFantaAllenatori() //Metodo che permette di visualizzare i dati sui fanta-allenatori. 
+        {
+            Console.Clear();
+            VisualizzaIntestazione();
+            Console.WriteLine("                   Funzionalità di visualizzazione dei fanta-allenatori                   ");
+            Console.WriteLine("\n   Di seguito verranno visualizzati i nomi e il budget disponibile di ogni fanta-allenatore.   \n");
+            for (int i = 0; i < FantaAllenatori.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}) {FantaAllenatori[i]}");
+            }
+        }
+
         static private void SchermataSchieramentoCampoFantaCalciatori() //Metodo che permette di visualizzare la prima parte della schermata di ricerca dei fanta-calciatori e poi l'inserimento di ogni giocatore in uno schieramento
         {
             Console.Clear();
@@ -305,58 +320,132 @@ namespace Fantacalcio
             OperazioniFile operazioniFile = new OperazioniFile();
             bool verificaFile = operazioniFile.VerificaEsistenzaFile(percorsiIO[2]);
             bool verifica = false;
-            int[,] codiciSchieramenti = new int[FantaAllenatori.Count, 18];
             if (verificaFile == true)
             {
                 Console.WriteLine("\nOra verrà visualizzato lo schieramento di ogni fanta-allenatore");
-            }
-            else
-            {
-                Console.WriteLine("\nGli schieramenti di ogni fanta-allenatore non sono stati ancora impostati.");
                 for (int i = 0; i < FantaAllenatori.Count; i++)
                 {
-                    codiciSchieramenti[i, 0] = i;
-                    for (int j = 0; j < 18; j++)
+                    SetResetColori(true);
+                    Console.WriteLine($"\nQuesto è lo schieramento di {FantaAllenatori[i].OttieniNome()}:");
+                    SetResetColori(false);
+                    for (int j = 0; j < CodiciSchieramenti.Count / (i + 1); j++)
                     {
-                        SetResetColori(true);
-                        Console.WriteLine($"\nScegli il {j + 1}o fanta-calciatore da schierare per {FantaAllenatori[i].nome}:");
-                        SetResetColori(false);
-                        Ricerca();
-                        Console.WriteLine("\nOra inserisci il giocatore che desideri inserire nel tuo schieramento:");
-                        int scelta;
-                        do
-                        {
-                            scelta = int.Parse(Console.ReadLine()) - 1;
-                            if (scelta < 0 || scelta > indici.Count)
-                            {
-                                Console.WriteLine("\nNon hai inserito un valore accettabile. Riprova...");
-                                verifica = false;
-                            }
-                            else
-                            {
-                                codiciSchieramenti[i, 1] = scelta;
-                                verifica = true;
-                            }
-
-                        } while (verifica == false);
+                        Console.WriteLine($"{j + 1}) {string.Join(' ', FantaCalciatori[CodiciSchieramenti[j * (i + 1)].Item2])}");
                     }
                 }
             }
-            
+            else
+            {
+                Console.WriteLine("\nGli schieramenti di ogni fanta-allenatore non sono stati ancora impostati, quindi, attraverso la\n     funzione di ricerca, puoi selezionare scegliere un giocatore per volta inserendo il\n                          valore numerico che gli corrisponde.");
+                for (int i = 0; i < FantaAllenatori.Count; i++)
+                {
+                    for (int j = 0; j < 18; j++)
+                    {
+                        SetResetColori(true);
+                        Console.WriteLine($"\nScegli il {j + 1}o fanta-calciatore da schierare per {FantaAllenatori[i].OttieniNome()}:");
+                        SetResetColori(false);
+                        bool aggiuntaGiocatore = Ricerca();
+                        if (aggiuntaGiocatore == true)
+                        {
+                            Console.WriteLine("\nOra inserisci il giocatore che desideri inserire nel tuo schieramento:");
+                            int scelta;
+                            do
+                            {
+                                scelta = int.Parse(Console.ReadLine()) - 1;
+                                if (scelta < 0 || scelta > Indici.Count)
+                                {
+                                    Console.WriteLine("\nNon hai inserito un valore accettabile. Riprova...");
+                                    verifica = false;
+                                }
+                                else
+                                {
+                                    CodiciSchieramenti.Add((i, j));
+                                    verifica = true;
+                                }
+
+                            } while (verifica == false);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"\nVuoi riprovare a ricercare di nuovo il {j + 1}o fanta-calciatore da schierare, oppure no?");
+                            if (RispostaSalvataggio() == "S")
+                            {
+                                j--;
+                            }
+                            else
+                            {
+                                verifica = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (verifica == false)
+                    {
+                        break;
+                    }
+                }
+            }
+            Console.WriteLine("\nGli schieramenti sono stati inseriti correttamenti. Desideri salvarli? (inserisci \"S\" se SI, altrimenti \"N\" se NO)");
+            if (RispostaSalvataggio() == "S")
+            {
+                Console.WriteLine("\nSalvataggio in corso...");
+                string output = JsonConvert.SerializeObject(CodiciSchieramenti);
+                operazioniFile.ScriviFile(percorsiIO[2], output);
+            }
         }
 
-        static private void SchermataAggiornamentoStatisticheFantaCalciatori()
+        static private string RispostaSalvataggio() //Metodo che permette di verificare la risposta di un utente in caso di una richiesta di salvataggio.
         {
+            string scelta;
+            bool verifica;
+            do
+            {
+                scelta = Console.ReadLine().ToUpper();
+                if (scelta != "S" && scelta != "N")
+                {
+                    Console.WriteLine("\nNon hai inserito un valore accettabile. Riprova...");
+                    verifica = false;
+                }
+                else
+                {
+                    verifica = true;
+                }
+
+            } while (verifica == false);
+            return scelta;
+        }
+
+        static private void SchermataAggiornamentoStatisticheFantaCalciatori() //Metodo che permette di visualizzare le richieste all'utente che porteranno all'aggiornamento delle statistiche dei fanta-calciatori.
+        {
+            string[] testoDaVisualizzare = new string[] { "la quotazione attuale", "il punteggio ottenuto nell'ultima partita" };
+            bool verifica;
             Console.Clear();
             VisualizzaIntestazione();
             Console.WriteLine("            Funzionalità di aggiornamento delle statistiche dei fanta-calciatori            ");
+            Console.WriteLine("\n     Ricerca un fanta-calciatore e cambiane le caratteristiche per aggiornare il suo\n                              punteggio in classifica");
+            Ricerca();
+            for (int i = 0; i < testoDaVisualizzare.Length; i++)
+            {
+                Console.WriteLine($"\nInserisci {testoDaVisualizzare[i]} del fanta-calciatore che hai scelto:");
+                do
+                {
+                    verifica = int.TryParse(Console.ReadLine(), out int datoAggiornato);
+                    if (verifica == false || datoAggiornato < 0)
+                    {
+                        Console.WriteLine("\nDevi inserire un numero maggiore o uguale a zero per questo campo. Riprova...");
+                        verifica = false;
+                    }
+
+                } while (verifica == false);
+            }
         }
 
-        static private void Ricerca() //Metodo che permette di visualizzare le richieste dei filtri di ricerca, ma anche i risultati della ricerca. 
+        static private bool Ricerca() //Metodo che permette di visualizzare le richieste dei filtri di ricerca, ma anche i risultati della ricerca. 
         {
             string[] testoDaVisualizzare = new string[] { "il nome", "il cognome", "la squadra", "il ruolo", "il numero di maglia", "la quotazione iniziale", "la quotazione attuale", "il punteggio in classifica" };
             string[] giocatoreRicercato = new string[] { "", "", "", "", "0", "0", "0", "0" };
             int contatoreFiltri = 0;
+            bool valoreRitornato;
             for (int i = 0; i < testoDaVisualizzare.Length; i++)
             {
                 SetResetColori(true);
@@ -372,32 +461,34 @@ namespace Fantacalcio
                     contatoreFiltri++;
                 }
             }
-            FantaCalciatore = new FantaCalciatore(giocatoreRicercato[0], giocatoreRicercato[1], giocatoreRicercato[2], giocatoreRicercato[3], int.Parse(giocatoreRicercato[4]), int.Parse(giocatoreRicercato[5]), int.Parse(giocatoreRicercato[6]), int.Parse(giocatoreRicercato[7]), 0);
-            indici = FantaCalciatore.RicercaFantaCalciatore(FantaCalciatori, contatoreFiltri);
-            if (indici.Count > 0)
+            FantaCalciatore fantaCalciatore = new FantaCalciatore(giocatoreRicercato[0], giocatoreRicercato[1], giocatoreRicercato[2], giocatoreRicercato[3], int.Parse(giocatoreRicercato[4]), int.Parse(giocatoreRicercato[5]), int.Parse(giocatoreRicercato[6]), int.Parse(giocatoreRicercato[7]), 0);
+            Indici = fantaCalciatore.RicercaFantaCalciatore(FantaCalciatori, contatoreFiltri);
+            if (Indici.Count > 0)
             {
                 SetResetColori(true);
-                if (indici.Count == 1)
+                if (Indici.Count == 1)
                 {
                     Console.WriteLine("\nLa ricerca ha prodotto un risultato...\n");
                 }
                 else
                 {
-                    Console.WriteLine($"\nLa ricerca ha prodotto {indici.Count} risultati...\n");
+                    Console.WriteLine($"\nLa ricerca ha prodotto {Indici.Count} risultati...\n");
                 }
                 SetResetColori(false);
                 Console.WriteLine("Di seguito verrà riportato l'elenco dei risultati con nome, cognome, squadra, ruolo, numero di maglia, quotazione iniziale, quotazione attuale, punteggio in classifica e proprietario del fanta-calciatore\n");
+                valoreRitornato = true;
             }
             else
             {
                 SetResetColori(true);
                 Console.WriteLine("\nLa ricerca non ha prodotto risultati...");
                 SetResetColori(false);
+                valoreRitornato = false;
             }
             int multipliDiciassete = 1;
-            for (int i = 0; i < indici.Count; i++)
+            for (int i = 0; i < Indici.Count; i++)
             {
-                Console.WriteLine($"{i + 1}) {FantaCalciatori[indici[i]].nome} {FantaCalciatori[indici[i]].cognome} {FantaCalciatori[indici[i]].squadra} {FantaCalciatori[indici[i]].ruolo} {FantaCalciatori[indici[i]].numeroMaglia} {FantaCalciatori[indici[i]].quotazioneIniziale} {FantaCalciatori[indici[i]].quotazioneAttuale} {FantaCalciatori[indici[i]].punteggioClassifica} {FantaAllenatori[FantaCalciatori[indici[i]].codiceRosa].nome}");
+                Console.WriteLine($"{i + 1}) {string.Join(' ', FantaCalciatori[Indici[i]])}");
                 if (i == 17 * multipliDiciassete)
                 {
                     multipliDiciassete++;
@@ -409,18 +500,36 @@ namespace Fantacalcio
                     Console.WriteLine("\n ===================  Fine dei risultati  =================== ");
                 }
             }
+            return valoreRitornato;
         }
 
-        static private void SchermataVisualizzazioneClassifiche()
+        static private void SchermataVisualizzazioneClassifiche() //Metodo che consente la visualizzazione della classifica dei fanta-calciatori.
         {
             Console.Clear();
             VisualizzaIntestazione();
             Console.WriteLine("            Funzionalità di visualizzazione della classifica dei fanta-calciatori            ");
+            Console.WriteLine("\n  Di seguito verrà visualizzata la classifica ordinata in modo crescente in base al punteggio.  ");
+            FantaCalciatore fantaCalciatore = new FantaCalciatore("", "", "", "", 0, 0, 0, 0, 0);
+            List<FantaCalciatore> FantaCalciatoriOrdinati = fantaCalciatore.OrdinaFantaCalciatori(FantaCalciatori);
+            SetResetColori(true);
+            Console.WriteLine("\n                                    =========================                                      \n");
+            SetResetColori(false);
+            int multipliNove = 1;
+            for (int i = 0; i < FantaCalciatoriOrdinati.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}) {string.Join(' ', FantaCalciatoriOrdinati[i])}");
+                if (i == 9 * multipliNove && i != FantaCalciatoriOrdinati.Count - 1)
+                {
+                    multipliNove++;
+                    Console.WriteLine("\nPremi invio per visualizzare ulteriori risultati...");
+                    Console.ReadKey();
+                }
+            }
         }
 
         static private bool SchermataCancellazioneDati() //Metodo che visualizza le richieste a video che poi porteranno o meno alla cancellazione dei dati del fanta-torneo. 
         {
-            bool verifica = false;
+            bool verifica;
             bool chiusuraProgramma = false;
             string scelta;
             Console.Clear();
@@ -456,6 +565,10 @@ namespace Fantacalcio
                         Console.WriteLine(operazioniFile.ToString());
                     }
                 }
+                FantaAllenatori.Clear();
+                FantaCalciatori.Clear();
+                Indici.Clear();
+                CodiciSchieramenti.Clear();
             }
             return chiusuraProgramma;
         }
@@ -534,14 +647,36 @@ namespace Fantacalcio
             {
                 GestisciErrori(1);
             }
+            
         }
         public void EliminaFile(string percorsoIO)
         {
-            File.Delete(percorsoIO);
+            try
+            {
+                File.Delete(percorsoIO);
+            }
+            catch(UnauthorizedAccessException)
+            {
+                GestisciErrori(0);
+            }
+            catch(IOException)
+            {
+                GestisciErrori(1);
+            }
         }
-        public void GestisciErrori(int codiceErrore)
+        public string GestisciErrori(int codiceErrore)
         {
-            
+            string descrizioneErrore = "";
+            switch(codiceErrore)
+            {
+                case (0):
+                    descrizioneErrore = "Si è verificato un errore nell'accesso al file (accesso non autorizzato). Si prega di riavviare il programma e, eventualmente, se non si risolve il problema, contattare l'amministratore di sistema.";
+                    break;
+                case (1):
+                    descrizioneErrore = "Si è verificato un errore nell'accesso al file (errore di IO). Si prega di riavviare il programma e, eventualmente, se non si risolve il problema, contattare l'amministratore di sistema.";
+                    break;
+            }
+            return descrizioneErrore;
         }
         public override string ToString()
         {
@@ -549,11 +684,15 @@ namespace Fantacalcio
         }
     }
 
+    [Serializable]
     class FantaAllenatore //La classe FantaAllenatore contiene gli attributi e i metodi che permettono operazioni per ogni fanta-allenatore. 
     {
-        public string nome { get; set; }
-        public int codiceRosa { get; set; }
-        public int budgetDisponibile { get; set; }
+        [JsonProperty]
+        private string nome { get; set; }
+        [JsonProperty]
+        private int codiceRosa { get; set; }
+        [JsonProperty]
+        private int budgetDisponibile { get; set; }
 
         public FantaAllenatore(string nome, int codiceRosa, int budgetDisponibile)
         {
@@ -573,24 +712,34 @@ namespace Fantacalcio
             return FantaAllenatori;
         }
 
-        public override string ToString()
+        public string OttieniNome()
         {
-            return "";
+            return nome;
         }
 
     }
 
+    [Serializable]
     class FantaCalciatore //La classe FantaCalciatore contiene gli attributi e i metodi che permettono operazioni per ogni fanta-calciatore. 
     {
-        public string nome { get; set; }
-        public string cognome { get; set; }
-        public string squadra { get; set; }
-        public string ruolo { get; set; }
-        public int numeroMaglia { get; set; }
-        public int quotazioneIniziale { get; set; }
-        public int quotazioneAttuale { get; set; }
-        public int punteggioClassifica { get; set; }
-        public int codiceRosa { get; set; }
+        [JsonProperty]
+        private string nome { get; set; }
+        [JsonProperty]
+        private string cognome { get; set; }
+        [JsonProperty]
+        private string squadra { get; set; }
+        [JsonProperty]
+        private string ruolo { get; set; }
+        [JsonProperty]
+        private int numeroMaglia { get; set; }
+        [JsonProperty]
+        private int quotazioneIniziale { get; set; }
+        [JsonProperty]
+        private int quotazioneAttuale { get; set; }
+        [JsonProperty]
+        private int punteggioClassifica { get; set; }
+        [JsonProperty]
+        private int codiceRosa { get; set; }
 
         public FantaCalciatore(string nome, string cognome, string squadra, string ruolo, int numeroMaglia, int quotazioneIniziale, int quotazioneAttuale, int punteggioClassifica, int codiceRosa)
         {
@@ -641,6 +790,17 @@ namespace Fantacalcio
             return indici;
         }
 
+        public List<FantaCalciatore> OrdinaFantaCalciatori(List<FantaCalciatore> FantaCalciatori)
+        {
+            FantaCalciatori.Sort(ComparaPunteggi);
+            return FantaCalciatori;
+        }
+
+        public int ComparaPunteggi(FantaCalciatore calciatore1, FantaCalciatore calciatore2)
+        {
+            return calciatore2.punteggioClassifica.CompareTo(calciatore1.punteggioClassifica);
+        }
+
         Predicate<FantaCalciatore> CreaPredicato(int i)
         {
             Predicate<FantaCalciatore> predicato = null;
@@ -673,14 +833,16 @@ namespace Fantacalcio
             }
             return predicato;
         }
-        public void AggiornaStatisticheFantaCalciatore()
-        {
 
+        public void AggiornaQuotazioneAttuale(int quotazioneAttuale)
+        {
+            this.quotazioneAttuale = quotazioneAttuale;
         }
 
-        public void OrdinaFantaCalciatori()
+        public int AggiornaPunteggio(int punteggioPartita)
         {
-
+            punteggioClassifica += punteggioPartita;
+            return punteggioClassifica;
         }
 
         public override string ToString()
