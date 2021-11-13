@@ -9,7 +9,6 @@ using System.IO; //Spazio dei nomi che permette la gestione dei file in generale
 using System.Collections.Generic; //Spazio dei nomi che permette la gestione delle liste.
 //Direttive using aggiuntive (NuGet).
 using Newtonsoft.Json; //Spazio dei nomi che permette la gestione dei file json.
-using System.Runtime.Serialization;
 
 
 namespace Fantacalcio
@@ -18,38 +17,42 @@ namespace Fantacalcio
 
     class Programma //La classe Programma è la prima ad essere richiamata dal programma al suo avvio e contiene la visualizzazione a schermo di testo, oltre alle richieste di inserimento rivolte all'utente. 
     {
-        //Variabili necessarie per il programma.
+        //Variabili
 
-        private static readonly string[] percorsiIO = new string[] { @"C:\Programma Gestionale Fantacalcio\fanta-allenatori.json", @"C:\Programma Gestionale Fantacalcio\fanta-calciatori.json", @"C:\Programma Gestionale Fantacalcio\schieramenti.json" };
-        private static readonly string percorsoCartella = @"C:\Programma Gestionale Fantacalcio";
+        //Variabili necessarie per contenere i percorsi dei file e della loro cartella che possono essere solamente lette (readonly).
+        static private readonly string[] percorsiIO = new string[] { @"C:\Programma Gestionale Fantacalcio\fanta-allenatori.json", @"C:\Programma Gestionale Fantacalcio\fanta-calciatori.json", @"C:\Programma Gestionale Fantacalcio\schieramenti.json" };
+        static private readonly string percorsoCartella = @"C:\Programma Gestionale Fantacalcio";
+
+        //Liste necessarie per contenere ogni dato del fanta-torneo.
         static private List<FantaAllenatore> FantaAllenatori = new List<FantaAllenatore>();
         static private List<FantaCalciatore> FantaCalciatori = new List<FantaCalciatore>();
-        static private List<int> Indici = new List<int>();
         static private List<(int, int)> CodiciSchieramenti = new List<(int, int)>();
+        static private List<int> Indici = new List<int>();
 
-        static void Main() //Metodo principale, il primo che viene richiamato dal programma, che stabilisce quali metodi invocare in base al fatto che si tratti di un avvio comune oppure il primo. 
-        {
+        //Metodi
+
+        //Metodo principale, il primo che viene richiamato dal programma, che stabilisce quali metodi invocare in base al fatto che si tratti di un avvio comune oppure il primo. 
+        static private void Main()
+        { 
             bool chiusuraProgramma;
             bool[] verificaFile = new bool[2];
             Console.Title = "Programma Gestionale del Fantacalcio";
             do
             {
+                OperazioniFile operazioniFile = new OperazioniFile();
                 Console.Clear();
                 for (int i = 0; i < 2; i++)
                 {
-                    OperazioniFile operazioniFile = new OperazioniFile();
                     verificaFile[i] = operazioniFile.VerificaEsistenzaFile(percorsiIO[i]);
                 }
                 if (verificaFile[0] == false || verificaFile[1] == false)
                 {
                     VisualizzaIntestazione();
-                    OperazioniFile operazioniFile = new OperazioniFile();
                     operazioniFile.CreaDirectory(percorsoCartella);
                     PrimoAvvio();
                 }
                 for (int i = 0; i < 2; i++)
                 {
-                    OperazioniFile operazioniFile = new OperazioniFile();
                     string contenutoInput = operazioniFile.LeggiFile(percorsiIO[i]);
                     if (i == 0)
                     {
@@ -74,7 +77,8 @@ namespace Fantacalcio
 
         }
 
-        static private void VisualizzaIntestazione() //Metodo che permette la visualizzazione dell'intestazione "Programma gestionale del Fantacalcio" in ogni schermata. 
+        //Metodo che permette la visualizzazione dell'intestazione "Programma gestionale del Fantacalcio" in ogni schermata.
+        static private void VisualizzaIntestazione() 
         {
             SetResetColori(true);
             Console.WriteLine("                                       _________          ________                                 " +
@@ -87,7 +91,8 @@ namespace Fantacalcio
             SetResetColori(false);
         }
 
-        static public void PrimoAvvio() //Metodo richiamato dal Main solamente quando il programma viene avviato per la prima volta. Contiene le visualizzazioni video e le prime richieste di inserimento per l'utente. 
+        //Metodo richiamato dal Main solamente quando il programma viene avviato per la prima volta. Contiene le visualizzazioni video e le prime richieste di inserimento per l'utente. 
+        static public void PrimoAvvio()
         {
             bool verifica;
             Console.WriteLine("                      Benvenuto nel programma gestionale del fantacalcio.                      \n"
@@ -139,7 +144,8 @@ namespace Fantacalcio
             SchermataInserimentoRose();
         }
 
-        static private void SchermataInserimentoRose() //Metodo che viene richiamato solo da PrimoAvvio e che contiene la visualizzazione video delle richieste che permettono all'utente l'inserimento delle rose dei fanta-allenatori. 
+        //Metodo che viene richiamato solo da PrimoAvvio e che contiene la visualizzazione video delle richieste che permettono all'utente l'inserimento delle rose dei fanta-allenatori.
+        static private void SchermataInserimentoRose() 
         {
             bool verifica = false;
             string ruolo;
@@ -236,7 +242,8 @@ namespace Fantacalcio
             Console.Clear();
         }
 
-        static private bool AvvioComune() //Metodo richiamato quando i dati iniziali sono stati configurati. Permette la visualizzazione di un menu di scelta tra le diverse funzionalità del programma. 
+        //Metodo richiamato quando i dati iniziali sono stati configurati. Permette la visualizzazione di un menu di scelta tra le diverse funzionalità del programma.
+        static private bool AvvioComune()  
         {
             bool chiusuraProgramma = false;
             bool verifica;
@@ -292,7 +299,8 @@ namespace Fantacalcio
             return chiusuraProgramma;
         }
 
-        static private void SchermataRicercaFantaCalciatori() //Metodo che permette di visualizzare la prima parte della schermata di ricerca dei fanta-calciatori. 
+        //Metodo che permette di visualizzare la prima parte della schermata di ricerca dei fanta-calciatori. 
+        static private void SchermataRicercaFantaCalciatori() 
         {
             Console.Clear();
             VisualizzaIntestazione();
@@ -300,7 +308,8 @@ namespace Fantacalcio
             Ricerca();
         }
 
-        static public void SchermataVisualizzazioneFantaAllenatori() //Metodo che permette di visualizzare i dati sui fanta-allenatori. 
+        //Metodo che permette di visualizzare i dati sui fanta-allenatori.
+        static public void SchermataVisualizzazioneFantaAllenatori()  
         {
             Console.Clear();
             VisualizzaIntestazione();
@@ -308,11 +317,12 @@ namespace Fantacalcio
             Console.WriteLine("\n   Di seguito verranno visualizzati i nomi e il budget disponibile di ogni fanta-allenatore.   \n");
             for (int i = 0; i < FantaAllenatori.Count; i++)
             {
-                Console.WriteLine($"{i + 1}) {FantaAllenatori[i]}");
+                Console.WriteLine($"{i + 1}) {FantaAllenatori[i].ToString()}");
             }
         }
 
-        static private void SchermataSchieramentoCampoFantaCalciatori() //Metodo che permette di visualizzare la prima parte della schermata di ricerca dei fanta-calciatori e poi l'inserimento di ogni giocatore in uno schieramento
+        //Metodo che permette di visualizzare la prima parte della schermata di ricerca dei fanta-calciatori e poi l'inserimento di ogni giocatore in uno schieramento
+        static private void SchermataSchieramentoCampoFantaCalciatori() 
         {
             Console.Clear();
             VisualizzaIntestazione();
@@ -330,7 +340,7 @@ namespace Fantacalcio
                     SetResetColori(false);
                     for (int j = 0; j < CodiciSchieramenti.Count / (i + 1); j++)
                     {
-                        Console.WriteLine($"{j + 1}) {string.Join(' ', FantaCalciatori[CodiciSchieramenti[j * (i + 1)].Item2])}");
+                        Console.WriteLine($"{j + 1}) {FantaCalciatori[CodiciSchieramenti[j * (i + 1)].Item2].ToString()}");
                     }
                 }
             }
@@ -394,7 +404,8 @@ namespace Fantacalcio
             }
         }
 
-        static private string RispostaSalvataggio() //Metodo che permette di verificare la risposta di un utente in caso di una richiesta di salvataggio.
+        //Metodo che permette di verificare la risposta di un utente in caso di una richiesta di salvataggio.
+        static private string RispostaSalvataggio()
         {
             string scelta;
             bool verifica;
@@ -415,7 +426,8 @@ namespace Fantacalcio
             return scelta;
         }
 
-        static private void SchermataAggiornamentoStatisticheFantaCalciatori() //Metodo che permette di visualizzare le richieste all'utente che porteranno all'aggiornamento delle statistiche dei fanta-calciatori.
+        //Metodo che permette di visualizzare le richieste all'utente che porteranno all'aggiornamento delle statistiche dei fanta-calciatori.
+        static private void SchermataAggiornamentoStatisticheFantaCalciatori() 
         {
             string[] testoDaVisualizzare = new string[] { "la quotazione attuale", "il punteggio ottenuto nell'ultima partita" };
             bool verifica;
@@ -440,7 +452,8 @@ namespace Fantacalcio
             }
         }
 
-        static private bool Ricerca() //Metodo che permette di visualizzare le richieste dei filtri di ricerca, ma anche i risultati della ricerca. 
+        //Metodo che permette di visualizzare le richieste dei filtri di ricerca, ma anche i risultati della ricerca. 
+        static private bool Ricerca()
         {
             string[] testoDaVisualizzare = new string[] { "il nome", "il cognome", "la squadra", "il ruolo", "il numero di maglia", "la quotazione iniziale", "la quotazione attuale", "il punteggio in classifica" };
             string[] giocatoreRicercato = new string[] { "", "", "", "", "0", "0", "0", "0" };
@@ -488,7 +501,7 @@ namespace Fantacalcio
             int multipliDiciassete = 1;
             for (int i = 0; i < Indici.Count; i++)
             {
-                Console.WriteLine($"{i + 1}) {string.Join(' ', FantaCalciatori[Indici[i]])}");
+                Console.WriteLine($"{i + 1}) {FantaCalciatori[Indici[i]].ToString()} {FantaAllenatori[FantaCalciatori[Indici[i]].OttieniCodiceRosa()].OttieniNome()}");
                 if (i == 17 * multipliDiciassete)
                 {
                     multipliDiciassete++;
@@ -503,7 +516,8 @@ namespace Fantacalcio
             return valoreRitornato;
         }
 
-        static private void SchermataVisualizzazioneClassifiche() //Metodo che consente la visualizzazione della classifica dei fanta-calciatori.
+        //Metodo che consente la visualizzazione della classifica dei fanta-calciatori.
+        static private void SchermataVisualizzazioneClassifiche()
         {
             Console.Clear();
             VisualizzaIntestazione();
@@ -517,7 +531,7 @@ namespace Fantacalcio
             int multipliNove = 1;
             for (int i = 0; i < FantaCalciatoriOrdinati.Count; i++)
             {
-                Console.WriteLine($"{i + 1}) {string.Join(' ', FantaCalciatoriOrdinati[i])}");
+                Console.WriteLine($"{i + 1}) {FantaCalciatoriOrdinati[i].ToString()}");
                 if (i == 9 * multipliNove && i != FantaCalciatoriOrdinati.Count - 1)
                 {
                     multipliNove++;
@@ -527,7 +541,8 @@ namespace Fantacalcio
             }
         }
 
-        static private bool SchermataCancellazioneDati() //Metodo che visualizza le richieste a video che poi porteranno o meno alla cancellazione dei dati del fanta-torneo. 
+        //Metodo che visualizza le richieste a video che poi porteranno o meno alla cancellazione dei dati del fanta-torneo.
+        static private bool SchermataCancellazioneDati() 
         {
             bool verifica;
             bool chiusuraProgramma = false;
@@ -573,7 +588,8 @@ namespace Fantacalcio
             return chiusuraProgramma;
         }
 
-        static public void SetResetColori(bool controllo) //Metodo che permette di cambiare i colori dei caratteri e dello sfondo, oppure di farli tornare standard. 
+        //Metodo che permette di cambiare i colori dei caratteri e dello sfondo, oppure di farli tornare alle proprietà standard. 
+        static public void SetResetColori(bool controllo)
         {
             if (controllo == true)
             {
@@ -590,11 +606,6 @@ namespace Fantacalcio
 
     class OperazioniFile //La classe OperazioniFile contiene i metodi necessari a compiere le operazioni su file. 
     {
-        public OperazioniFile()
-        {
-            
-        }
-
         public bool VerificaEsistenzaFile(string percorsoIO)
         {
             return File.Exists(percorsoIO);
@@ -684,16 +695,21 @@ namespace Fantacalcio
         }
     }
 
-    [Serializable]
+    [Serializable] //Attributo che indica che la classe sottostante può essere oggetto di serializzazione per l'inserimento degli attributi della classe in un file JSON.
     class FantaAllenatore //La classe FantaAllenatore contiene gli attributi e i metodi che permettono operazioni per ogni fanta-allenatore. 
     {
-        [JsonProperty]
-        private string nome { get; set; }
-        [JsonProperty]
-        private int codiceRosa { get; set; }
-        [JsonProperty]
-        private int budgetDisponibile { get; set; }
+        //Attributi
 
+        [JsonProperty] //Attributo che indica che l'attributo sottostante pò far parte delle proprietà di un file JSON; è importante perché senza questo speciale attributo non si sarebbe in grado di inserire il contenuto dell'attributo sottostante in un file JSON.
+        private string nome { get; set; } //Attibuto della classe che contiene il nome del fanta-allenatore.
+        [JsonProperty]
+        private int codiceRosa { get; set; } //Attibuto della classe che contiene il codice della rosa del fanta-allenatore.
+        [JsonProperty]
+        private int budgetDisponibile { get; set; } //Attibuto della classe che contiene il budget disponibile del fanta-allenatore.
+
+        //Metodi
+
+        //Metodo costruttore: vengono passati al metodo tutti gli attributi di un fanta-calciatore all'istanziazione della classe e i loro valori vengono assegnati agli attributi della classe corrente.
         public FantaAllenatore(string nome, int codiceRosa, int budgetDisponibile)
         {
             this.nome = nome;
@@ -701,8 +717,10 @@ namespace Fantacalcio
             this.budgetDisponibile = budgetDisponibile;
         }
 
-        public List<FantaAllenatore> AggiungiFantaAllenatore(List<FantaAllenatore> FantaAllenatori)
+        //Metodo che permette l'aggiunta di un fanta-allenatore alla lista dei fanta-allenatori.
+        public List<FantaAllenatore> AggiungiFantaAllenatore(List<FantaAllenatore> FantaAllenatori) //Il metodo accetta come argomento la lista FantaAllenatori e la restituisce con il nuovo fanta-allenatore aggiunto. 
         {
+            //Il metodo List.Add() permette di creare una nuova posizione all'interno della lista e di aggiungervi i nuovi dati (in questo caso quelli di un fanta-allenatore, i cui dati corrispondono agli attributi della classe FantaAllenatore).
             FantaAllenatori.Add(new FantaAllenatore(nome, codiceRosa, budgetDisponibile)
             {
                 nome = nome,
@@ -712,35 +730,54 @@ namespace Fantacalcio
             return FantaAllenatori;
         }
 
+        //Metodo che permette di accedere all'attributo nome e di restituirlo.
         public string OttieniNome()
         {
             return nome;
         }
 
+        //Metodo che sovrascrive il metodo ToString() e ritorna gli attributi del fanta-allenatore concatenati e divisi da uno spazio fra di loro grazie al metodo string.Join(). 
+        public override string ToString()
+        {
+            return $"{string.Join(' ', nome, budgetDisponibile)} Fantamilioni";
+        }
     }
 
-    [Serializable]
+    [Serializable] //Attributo che indica che la classe sottostante può essere oggetto di serializzazione per l'inserimento degli attributi della classe in un file JSON.
     class FantaCalciatore //La classe FantaCalciatore contiene gli attributi e i metodi che permettono operazioni per ogni fanta-calciatore. 
     {
-        [JsonProperty]
-        private string nome { get; set; }
-        [JsonProperty]
-        private string cognome { get; set; }
-        [JsonProperty]
-        private string squadra { get; set; }
-        [JsonProperty]
-        private string ruolo { get; set; }
-        [JsonProperty]
-        private int numeroMaglia { get; set; }
-        [JsonProperty]
-        private int quotazioneIniziale { get; set; }
-        [JsonProperty]
-        private int quotazioneAttuale { get; set; }
-        [JsonProperty]
-        private int punteggioClassifica { get; set; }
-        [JsonProperty]
-        private int codiceRosa { get; set; }
+        //Attributi
 
+        [JsonProperty] //Attributo che indica che l'attributo sottostante pò far parte delle proprietà di un file JSON; è importante perché senza questo speciale attributo non si sarebbe in grado di inserire il contenuto dell'attributo sottostante in un file JSON.
+        private string nome { get; set; } //Attibuto della classe che contiene il nome del fanta-calciatore.
+
+        [JsonProperty] 
+        private string cognome { get; set; } //Attibuto della classe che contiene il cognome del fanta-calciatore.
+
+        [JsonProperty]
+        private string squadra { get; set; } //Attibuto della classe che contiene il nome della squadra del fanta-calciatore.
+
+        [JsonProperty]
+        private string ruolo { get; set; } //Attibuto della classe che contiene il ruolo del fanta-calciatore nella squadra.
+
+        [JsonProperty]
+        private int numeroMaglia { get; set; } //Attibuto della classe che contiene il numero di maglia del fanta-calciatore.
+
+        [JsonProperty]
+        private int quotazioneIniziale { get; set; } //Attibuto della classe che contiene la quotazione iniziale, cioè a inizio del fanta-torneo, del fanta-calciatore.
+
+        [JsonProperty]
+        private int quotazioneAttuale { get; set; } //Attibuto della classe che contiene la quotazione attuale, cioè l'ultima, del fanta-calciatore.
+
+        [JsonProperty]
+        private int punteggioClassifica { get; set; } //Attibuto della classe che contiene l'attuale punteggio in classifica del fanta-calciatore.
+
+        [JsonProperty]
+        private int codiceRosa { get; set; } //Attibuto della classe che contiene il codice del fanta-allenatore a cui appartiene il fanta-calciatore.
+
+        //Metodi
+
+        //Metodo costruttore: vengono passati al metodo tutti gli attributi di un fanta-calciatore all'istanziazione della classe e i loro valori vengono assegnati agli attributi della classe corrente.
         public FantaCalciatore(string nome, string cognome, string squadra, string ruolo, int numeroMaglia, int quotazioneIniziale, int quotazioneAttuale, int punteggioClassifica, int codiceRosa)
         {
             this.nome = nome;
@@ -754,8 +791,10 @@ namespace Fantacalcio
             this.codiceRosa = codiceRosa;
         }
 
-        public List<FantaCalciatore> AggiungiFantaCalciatore(List<FantaCalciatore> FantaCalciatori)
+        //Metodo che permette l'aggiunta di un fanta-calciatore alla lista dei fanta-calciatori.
+        public List<FantaCalciatore> AggiungiFantaCalciatore(List<FantaCalciatore> FantaCalciatori) //Il metodo accetta come argomento la lista FantaCalciatori e la restituisce con il nuovo fanta-calciatore aggiunto.
         {
+            //Il metodo List.Add() permette di creare una nuova posizione all'interno della lista e di aggiungervi i nuovi dati (in questo caso quelli di un fanta-calciatore, i cui dati corrispondono agli attributi della classe FantaCalciatore).
             FantaCalciatori.Add(new FantaCalciatore(nome, cognome, squadra, ruolo, numeroMaglia, quotazioneIniziale, quotazioneAttuale, punteggioClassifica, codiceRosa)
             {
                 nome = nome,
@@ -772,40 +811,33 @@ namespace Fantacalcio
             return FantaCalciatori;
         }
 
-        public List<int> RicercaFantaCalciatore(List<FantaCalciatore> FantaCalciatori, int contatoreFiltri)
+        //Metodo che permette di eseguire la ricerca del fanta-calciatore all'interno della lista dei fanta-calciatori.
+        public List<int> RicercaFantaCalciatore(List<FantaCalciatore> FantaCalciatori, int contatoreFiltri) //Il metodo accetta come argomenti la lista FantaCalciatori e il numero di filtri inseriti dall'utente e la restituisce con una nuova lista (Indici) con gli indici degli elementi ricercati nella lista FantaCalciatori.
         {
-            List<FantaCalciatore> FantaCalciatoriTrovati = FantaCalciatori;
-            List<int> indici = new List<int>();
+            List<int> Indici = new List<int>(); //Viene inizializzata una lista di tipo int per contenere gli indici dei fanta-calciatori trovati.
             for (int i = 0; i < contatoreFiltri; i++)
             {
-                var elementi = FantaCalciatoriTrovati.FindAll(CreaPredicato(i));
-                if (i == contatoreFiltri - 1)
+                //Il metodo List.FindAll() consente di trovare tutte le occorrenze all'interno di una lista basandosi su oggetti di tipo Predicate definiti dal metodo DefinisciPredicato.
+                var elementi = FantaCalciatori.FindAll(DefinisciPredicato(i));
+                if (i == contatoreFiltri - 1) //Solo alla fine della verifica dei filtri si eseguono le seguenti istruzioni.
                 {
-                    foreach (var elemento in elementi)
+                    foreach (var elemento in elementi) //Per ogni elemento trovato in elementi, si aggiunge l'indice nella lista FantaCalciatori corrispondente all'elemento nella lista Indici.
                     {
-                        indici.Add(FantaCalciatoriTrovati.IndexOf(elemento));
+                        Indici.Add(FantaCalciatori.IndexOf(elemento)); //Il metodo List.IndexOf() permette di individuare l'indice di un elemento all'interno di una lista.
                     }
                 }
             }
-            return indici;
+            return Indici;
         }
 
-        public List<FantaCalciatore> OrdinaFantaCalciatori(List<FantaCalciatore> FantaCalciatori)
+        //Metodo di tipo Predicate<T> che definisce un set di criteri e determina se l'oggetto specificato soddisfa tali criteri; è utilizzato per definire il predicato da utilizzare metodo di ricerca.
+        private Predicate<FantaCalciatore> DefinisciPredicato(int i) //Il metodo accetta come argomento un indice e ritorna un predicato in base al valore dell'indice.
         {
-            FantaCalciatori.Sort(ComparaPunteggi);
-            return FantaCalciatori;
-        }
-
-        public int ComparaPunteggi(FantaCalciatore calciatore1, FantaCalciatore calciatore2)
-        {
-            return calciatore2.punteggioClassifica.CompareTo(calciatore1.punteggioClassifica);
-        }
-
-        Predicate<FantaCalciatore> CreaPredicato(int i)
-        {
-            Predicate<FantaCalciatore> predicato = null;
-            switch (i)
+            Predicate<FantaCalciatore> predicato = null; //Viene inizializzato il predicato con il valore null.
+            switch (i) //In base al valore di i, si possono verificare diversi casi.
             {
+                //Ognuno dei seguenti casi viene applicato nel caso in cui ci si trovi, nella ricerca, ad analizzare l'attributo nome, cognome, squadra, ruolo, ecc... 
+                //Per il confronto di stringhe viene usato il metodo string.Contains(), mentre per il valori interi si usa semplicemente un operatore di uguaglianza.
                 case (0):
                     predicato = FantaCalciatoriTrovati => FantaCalciatoriTrovati.nome.Contains(nome);
                     break;
@@ -834,20 +866,42 @@ namespace Fantacalcio
             return predicato;
         }
 
+        //Metodo che permette di eseguire l'ordinamento della lista dei fanta-calciatori in base al punteggio ottenuto.
+        public List<FantaCalciatore> OrdinaFantaCalciatori(List<FantaCalciatore> FantaCalciatori) //Il metodo accetta come argomento la lista FantaCalciatori e ritorna la stessa lista ordinata.
+        {
+            FantaCalciatori.Sort(ComparaPunteggi); //Il metodo List.Sort(Comparison<T>) permette di eseguire l'ordinamento usando un oggetto di tipo Comparison definito dal metodo ComparaPunteggi.
+            return FantaCalciatori;
+        }
+
+        //Metodo di tipo Comparison<T> che permette di confrontare due fanta-calciatori e determinare quale dei due ha maggiore punteggio in classifica.
+        private int ComparaPunteggi(FantaCalciatore calciatore1, FantaCalciatore calciatore2) //Il metodo accetta come argomenti due istanze di FantaCalciatore e ritorna il valore restituito dal metodo string.CompareTo().
+        {
+            return calciatore2.punteggioClassifica.CompareTo(calciatore1.punteggioClassifica); //Il metodo string.CompareTo() è necessario nel caso per determinare se una stringa si trovi prima o dopo nell'ordinamenti rispetto ad un'altra stringa.
+        }
+
+        //Metodo che permette di accedere all'attributo codiceRosa e che restituisce il valore di questo attributo.
+        public int OttieniCodiceRosa()
+        {
+            return codiceRosa;
+        }
+
+        //Metodo che permette di accedere all'attributo quotazioneAttuale e aggiornarne il valore.
         public void AggiornaQuotazioneAttuale(int quotazioneAttuale)
         {
             this.quotazioneAttuale = quotazioneAttuale;
         }
 
+        //Metodo che permette di accedere all'attributo punteggioClassifica e aggiornarne il valore, sommando il punteggio già esistente a quello ottenuto nell'ultima partita.
         public int AggiornaPunteggio(int punteggioPartita)
         {
             punteggioClassifica += punteggioPartita;
             return punteggioClassifica;
         }
 
+        //Metodo che sovrascrive il metodo ToString() e ritorna gli attributi del fanta-calciatore concatenati e divisi da uno spazio fra di loro grazie al metodo string.Join(). 
         public override string ToString()
         {
-            return $"{nome} {cognome} {squadra} {ruolo} {numeroMaglia} {quotazioneIniziale} {quotazioneAttuale} {punteggioClassifica}";
+            return string.Join(' ', nome, cognome, squadra, ruolo, numeroMaglia, quotazioneIniziale, quotazioneAttuale, punteggioClassifica);
         }
     }
 }
