@@ -1,0 +1,12 @@
+[
+  {
+    "nome": "Francesco",
+    "codiceRosa": 0,
+    "budgetDisponibile": 2500
+  },
+  {
+    "nome": "Roberto",
+    "codiceRosa": 1,
+    "budgetDisponibile": 2540
+  }
+]

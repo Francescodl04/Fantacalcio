@@ -20,7 +20,7 @@ namespace Fantacalcio
         //Variabili
 
         //Variabili necessarie per contenere i percorsi dei file e della loro cartella che possono essere solamente lette (readonly).
-        static private readonly string[] percorsiIO = new string[] { @"C:\Programma Gestionale Fantacalcio\fanta-allenatori.json", @"C:\Programma Gestionale Fantacalcio\fanta-calciatori.json", @"C:\Programma Gestionale Fantacalcio\schieramenti.json" };
+        static private readonly string[] percorsiFile = new string[] { @"C:\Programma Gestionale Fantacalcio\fanta-allenatori.json", @"C:\Programma Gestionale Fantacalcio\fanta-calciatori.json", @"C:\Programma Gestionale Fantacalcio\schieramenti.json" };
         static private readonly string percorsoCartella = @"C:\Programma Gestionale Fantacalcio";
 
         //Liste necessarie per contenere ogni dato del fanta-torneo.
@@ -45,7 +45,7 @@ namespace Fantacalcio
                 //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
                 for (int i = 0; i < 2; i++) 
                 {
-                    verificaFile[i] = operazioniFile.VerificaEsistenzaFile(percorsiIO[i]); //Inserisce il valore restituito dal metodo VerificaEsistenzaFile in ogni "casella" della matrice.
+                    verificaFile[i] = operazioniFile.VerificaEsistenzaFile(percorsiFile[i]); //Inserisce il valore restituito dal metodo VerificaEsistenzaFile in ogni "casella" della matrice.
                 }
                 if (verificaFile[0] == false || verificaFile[1] == false) //Se almeno uno dei file non esiste, allora vengono eseguite le seguenti istruzioni.
                 {
@@ -58,7 +58,11 @@ namespace Fantacalcio
                     }
                     else
                     {
-                        PrimoAvvio(); //Se non ci sono state eccezioni si procede con l'inserimento dei dati, contenuto in questo metodo.
+                        //Se non ci sono state eccezioni si procede con l'inserimento dei dati, contenuto nel metodo PrimoAvvio; se all'interno di quest'ultimo si verificano errori oppure l'utente lo decide, allora permette di uscire dal programma.
+                        if (PrimoAvvio() == true) 
+                        {
+                            break;
+                        }
                     }
                 }
                 else
@@ -66,7 +70,7 @@ namespace Fantacalcio
                     //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
                     for (int i = 0; i < 2; i++)
                     {
-                        string contenutoInput = operazioniFile.LeggiFile(percorsiIO[i]); //Inserisce il valore restituito dal metodo LeggiFile() all'interno della stringa: questo valore può essere il testo letto dal file oppure un messaggio di errore.
+                        string contenutoInput = operazioniFile.LeggiFile(percorsiFile[i]); //Inserisce il valore restituito dal metodo LeggiFile() all'interno della stringa: questo valore può essere il testo letto dal file oppure un messaggio di errore.
                         if (contenutoInput.StartsWith("ERRORE:")) //Se si è generata un'eccezione, quindi la striga inizia per "ERRORE:", allora vengono eseguite le seguenti istruzioni.
                         {
                             Console.WriteLine(contenutoInput); //Se si è generata un'eccezione, quindi la striga inizia per "ERRORE:", allora vengono eseguite le seguenti istruzioni.
@@ -75,7 +79,7 @@ namespace Fantacalcio
                         else
                         {
                             //Se non ci sono state eccezioni, allora si può lavorare con il testo dei due file.
-                            //Si effettua la deserializzazione del file, che divide i vari attributi presenti nei due file e si inseriscono ordinatamente all'interno della rispettive liste.
+                            //Si effettua la deserializzazione del file, che divide i vari attributi presenti nei due file e vengono inseriti ordinatamente all'interno della rispettive liste.
                             if (i == 0)
                             {
                                 FantaAllenatori = JsonConvert.DeserializeObject<List<FantaAllenatore>>(contenutoInput);
@@ -88,16 +92,17 @@ namespace Fantacalcio
                     }
                 }
                 VisualizzaIntestazione(); //Viene visualizzata a schermo l'intestazione "Programma gestionale del Fantacalcio".
-                chiusuraProgramma = AvvioComune();
-                if (chiusuraProgramma == false)
+                //Si fa riferimento al metodo AvvioComune che permette la visualizzazione del menu principale e il valore che restituisce viene usato per decidere se è il momento o meno di interrompere il ciclo do-while per permettere la chiusura del programma.
+                chiusuraProgramma = AvvioComune(); 
+                if (chiusuraProgramma == false) //Viene visualizzato al termine di una funzionalità per avvisare l'utente del ritorno alla schermata iniziale.
                 {
                     Console.WriteLine("\nPer tornare alla schermata iniziale premere un tasto qualsiasi...");
-                    Console.ReadKey();
+                    Console.ReadKey(); //Metodo che permette di acquisire la pressione di un tasto qualsiasi da parte dell'utente.
                 }
             } while (chiusuraProgramma == false);
             Console.WriteLine("\n\nPer uscire dal programma premi un tasto qualsiasi...");
-            Console.ReadKey();
-            Environment.Exit(0);
+            Console.ReadKey(); //Metodo che permette di acquisire la pressione di un tasto qualsiasi da parte dell'utente.
+            Environment.Exit(0); //Metodo che permette di uscire dal programma.
 
         }
 
@@ -105,6 +110,7 @@ namespace Fantacalcio
         static private void VisualizzaIntestazione() 
         {
             SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
+            //Il metodo seguente effettua la visualizzazione vera e propria dell'intestazione.
             Console.WriteLine("                                       _________          ________                                 " +
                               "\n                     Il               |    _____|        |    ____|                                " +
                               "\n                 programma            |   |___           |   |                                     " +
@@ -116,7 +122,7 @@ namespace Fantacalcio
         }
 
         //Metodo richiamato dal Main solamente quando il programma viene avviato per la prima volta. Contiene le visualizzazioni video e le prime richieste di inserimento per l'utente. 
-        static public void PrimoAvvio()
+        static public bool PrimoAvvio()
         {
             bool ripetiCiclo; //Variabile necessaria per definire se continuare o meno l'iterazione dei cicli do-while.
             Console.WriteLine("                      Benvenuto nel programma gestionale del fantacalcio.                      \n"
@@ -126,65 +132,68 @@ namespace Fantacalcio
             SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
             Console.WriteLine("Inserisci il torneo reale di riferimento per il gioco:");
             SetResetColori(false); //Riporta i colori alle proprietà standard.
-            string torneo = Console.ReadLine();
-            int numeroFantaAllenatori;
+            string fantaTorneo = Console.ReadLine(); //Viene acquisito il nome del fanta-torneo.
+            int numeroFantaAllenatori; //Variabile necessaria per contenere il numero di fanta-allenatori che partecipano al gioco.
             //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
             do
             {
                 SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
                 Console.WriteLine("\nInserisci il numero dei fanta-allenatori che parteciperanno al gioco:");
                 SetResetColori(false); //Riporta i colori alle proprietà standard.
-                ripetiCiclo = int.TryParse(Console.ReadLine(), out numeroFantaAllenatori);
-                if (ripetiCiclo == false || numeroFantaAllenatori < 2 || numeroFantaAllenatori > 10)
+                ripetiCiclo = int.TryParse(Console.ReadLine(), out numeroFantaAllenatori); //Questo metodo permette di verificare se è possibile o meno convertire una variabile stringa in input: restituisce true in caso positivo, altrimenti restituisce false.
+                if (ripetiCiclo == false || numeroFantaAllenatori < 2 || numeroFantaAllenatori > 10) //Se il precedente metodo restituisce false oppure il numero inserito dall'utente è minore di 2 o maggiore di 10, allora avvisa l'utente con un messaggio.
                 {
                     Console.WriteLine("\nDevi inserire un numero compreso tra 2 e 10 (inclusi). Riprova...");
+                    ripetiCiclo = false;
                 }
             }
-            while (ripetiCiclo == false || numeroFantaAllenatori < 2 || numeroFantaAllenatori > 10);
+            while (ripetiCiclo == false);
             //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
             for (int i = 0; i < numeroFantaAllenatori; i++)
             {
                 SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
                 Console.WriteLine($"\nInserisci il nome del {i + 1}° giocatore:");
                 SetResetColori(false); //Riporta i colori alle proprietà standard.
-                string nomeFantaAllenatore = Console.ReadLine();
-                int budgetDisponibile;
+                string nomeFantaAllenatore = Console.ReadLine(); //Viene acquisito il nome del fanta-allenatore che si sta inserendo.
+                int budgetDisponibile; //Variabile necessaria per contenere il budget disponibile di un fanta-allenatore.
                 //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
                 do
                 {
                     SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
-                    Console.WriteLine($"\nInserisci il budget di {nomeFantaAllenatore} (in Fantamilioni):");
+                    Console.WriteLine($"\nInserisci il budget di {nomeFantaAllenatore} (in Fantamilioni):"); 
                     SetResetColori(false); //Riporta i colori alle proprietà standard.
-                    ripetiCiclo = int.TryParse(Console.ReadLine(), out budgetDisponibile);
-                    if (ripetiCiclo == false)
+                    ripetiCiclo = int.TryParse(Console.ReadLine(), out budgetDisponibile); //Questo metodo permette di verificare se è possibile o meno convertire una variabile stringa in input: restituisce true in caso positivo, altrimenti restituisce false.
+                    if (ripetiCiclo == false) //Se il precedente metodo restituisce false, allora avvisa l'utente con un messaggio.
                     {
                         Console.WriteLine("\nDevi inserire un numero. Riprova...");
                     }
                 }
                 while (ripetiCiclo == false);
-                FantaAllenatore FantaAllenatore = new FantaAllenatore(nomeFantaAllenatore, i, budgetDisponibile);
-                FantaAllenatori = FantaAllenatore.AggiungiFantaAllenatore(FantaAllenatori);
+                FantaAllenatore FantaAllenatore = new FantaAllenatore(nomeFantaAllenatore, i, budgetDisponibile); //Viene istanziata la classe FantaAllenatore e vengono passati gli attributi acquisiti dall'inserimento dell'utente.
+                FantaAllenatori = FantaAllenatore.AggiungiFantaAllenatore(FantaAllenatori); //Si fa riferimento al metodo AggiungiFantaAllenatore per eseguire l'inserimento del fanta-allenatore nella lista di FantaCalciatori. Il metodo restituisce quindi la lista aggiornata.
             }
             Console.WriteLine("\nBene, ora è necessario inserire le rose di ognuno dei giocatori. Se premi INVIO,\nla console verrà ripulita e si passerà alla schermata che permetterà di far questo.");
-            Console.ReadKey();
+            Console.ReadKey(); //Metodo che permette di acquisire la pressione di un tasto qualsiasi da parte dell'utente.
             Console.Clear(); //Elimina il contenuto della console.
-            SchermataInserimentoRose();
+            return SchermataInserimentoRose(); //Si fa riferimento a questo metodo per la visualizzazione della schermata di inserimento delle rose di fanta-calciatori.
         }
 
         //Metodo che viene richiamato solo da PrimoAvvio e che contiene la visualizzazione video delle richieste che permettono all'utente l'inserimento delle rose dei fanta-allenatori.
-        static private void SchermataInserimentoRose() 
+        static private bool SchermataInserimentoRose() 
         {
-            bool ripetiCiclo = false; //Variabile necessaria per definire se continuare o meno l'iterazione dei cicli do-while.
-            string ruolo;
-            string[] caratteristicheInserite;
+            bool ripetiCiclo = false, chiusuraProgramma = false; //La prima variabile è necessaria per definire se continuare o meno l'iterazione dei cicli do-while, l'altra per determinare se consentire o meno all'utente l'uscita dal programma.
+            string ruolo; //Variabile che conterrà il ruolo deciso automaticamente dal programma per un fanta-calciatore.
+            string[] caratteristicheInserite; //Matrice che conterrà caratteristiche di un fanta-calciatore.
             VisualizzaIntestazione(); //Viene visualizzata a schermo l'intestazione "Programma gestionale del Fantacalcio".
             Console.WriteLine("\nBene, ora che sono stati inseriti i dati principali dei fanta-allenatori, è necessario  " +
                 "\nche venga inserito ognuno dei nomi dei fanta-calciatori che sono stati aggiudicati durante l'asta.");
             //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
             for (int i = 0; i < FantaAllenatori.Count; i++)
             {
+                //Inizia il primo ciclo for interno, che permette l'esecuzione dell'inserimento di ogni singolo fanta-calciatore.
                 for (int j = 0; j < 25; j++)
                 {
+                    //In base al numero di fanta-calciatore al quale si è arrivati, ne viene scelto automaticamente il ruolo.
                     if (j < 3)
                     {
                         ruolo = "Portiere";
@@ -207,53 +216,58 @@ namespace Fantacalcio
                     //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
                     do
                     {
-                        string informazioniInserite = Console.ReadLine();
-                        caratteristicheInserite = informazioniInserite.Trim(' ').Split(',');
-                        if (caratteristicheInserite.Length != 5)
+                        string informazioniInserite = Console.ReadLine(); //Le caratteristiche di un fanta-calciatore vengono lette e inserite nella variabile.
+                        //Nel seguente metodo i effettua una eliminazione degli spazi in eccesso e una divisione della singola stringa in più stringhe (in base al carattere virgola) che vengono poi inserite all'interno della matrice unidimensionale caratteristicheInserite.
+                        caratteristicheInserite = informazioniInserite.Trim(' ').Split(','); 
+                        if (caratteristicheInserite.Length != 5) //Viene effettuato un controllo sul numero delle caratteristiche inserite: se non sono sufficienti, allora avvisa l'utente con un messaggio.
                         {
                             Console.WriteLine("\nNon hai inserito il giusto numero caratteristiche, quindi reinserisci il fanta-calciatore:");
                             ripetiCiclo = false;
                         }
                         else
                         {
-                            for (int k = 3; k < caratteristicheInserite.Length; k++)
+                            for (int k = 3; k < caratteristicheInserite.Length; k++) //Con questo secondo ciclo for interno si effettua un controllo sulle caratteristiche numeriche del fanta-calciatore.
                             {
-                                ripetiCiclo = int.TryParse(caratteristicheInserite[k], out int verificaInteger);
-                                if ((ripetiCiclo == false || verificaInteger < 0) && k == caratteristicheInserite.Length - 1)
+                                ripetiCiclo = int.TryParse(caratteristicheInserite[k], out int verificaInteger); //Questo metodo permette di verificare se è possibile o meno convertire una variabile stringa in input: restituisce true in caso positivo, altrimenti restituisce false.
+                                if ((ripetiCiclo == false || verificaInteger < 0) && k == caratteristicheInserite.Length - 1) //Nel caso in cui ci siano degli errori di inserimento (uno o più quindi) viene visualizzato un messaggio di errore solamente alla fine del ciclo di controllo.
                                 {
                                     Console.WriteLine($"\nIn alcune caratteristiche non hai inserito un numero maggiore\no uguale a zero, quindi reinserisci il fanta-calciatore:");
-                                    break;
+                                    break; //Il ciclo viene interrotto.
                                 }
                             }
                         }
                     }
                     while (ripetiCiclo == false);
-                    FantaCalciatore fantaCalciatore = new FantaCalciatore(caratteristicheInserite[0], caratteristicheInserite[1], caratteristicheInserite[2], ruolo, int.Parse(caratteristicheInserite[3]), int.Parse(caratteristicheInserite[4]), 0, 0, i);
-                    FantaCalciatori = fantaCalciatore.AggiungiFantaCalciatore(FantaCalciatori);
+                    //La classe FantaCalciatore viene successivamente istanziata, passando al metodo costruttore le caratteristiche del fanta-calciatore.
+                    FantaCalciatore fantaCalciatore = new FantaCalciatore(caratteristicheInserite[0], caratteristicheInserite[1], caratteristicheInserite[2], ruolo, int.Parse(caratteristicheInserite[3]), int.Parse(caratteristicheInserite[4]), 0, 0, i); 
+                    FantaCalciatori = fantaCalciatore.AggiungiFantaCalciatore(FantaCalciatori); //Si effettua l'aggiunta del fanta-calciatore nella lista FantaCalciatori attraverso questo metodo, che poi restituisce la lista agiornata.
                 }
             }
             //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
             for (int i = 0; i < FantaAllenatori.Count; i++)
             {
+                //Viene effettuata la visualizzazione della rosa di un fanta-allenatore.
                 Console.WriteLine($"\nQuesto è l'elenco del fanta-calciatori di {FantaAllenatori[i].OttieniNome()}:");
-                for (int j = 0; j < FantaCalciatori.Count / FantaAllenatori.Count; j++)
+                for (int j = 0; j < (FantaCalciatori.Count / FantaAllenatori.Count); j++) 
                 {
-                    Console.WriteLine($"{j + 1}) {string.Join(' ', FantaCalciatori[j * (i + 1)])}");
+                    Console.WriteLine($"{j + 1}) {FantaCalciatori[j * (i + 1)].ToString()}");
                 }
-                if (i != FantaAllenatori.Count - 1)
+                if (i != FantaAllenatori.Count - 1) //Solo nel caso in cui ci sia ancora almeno una rosa di un fanta-allenatore da visionare, allora visualizza il seguente messaggio.
                 {
                     Console.WriteLine("\nPer passare alla rosa del prossimo fanta-allenatore, premi un tasto qualsiasi...");
-                    Console.ReadKey();
+                    Console.ReadKey(); //Metodo che permette di acquisire la pressione di un tasto qualsiasi da parte dell'utente.
                 }
             }
             Console.WriteLine("\nSei sicuro di voler salvare le rose dei Fanta-Allenatori? (inserisci \"S\" per salvare, oppure \"N\" per rifare l'inserimento delle rose dei fanta-calciatori)");
             switch (RispostaSiNo()) //In base al valore che assume la stringa ritornata dal metodo, si possono presentare diversi casi.
             {
-                case ("S"):
+                case ("S"): 
                     Console.WriteLine("\nSalvataggio in corso...");
+                    //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
                     for (int i = 0; i < 2; i++)
                     {
                         string output;
+                        //Viene effettuata la serializzazione di una lista, cioè viene resa pronta per la scrittura in un file JSON.
                         if (i == 0)
                         {
                             output = JsonConvert.SerializeObject(FantaAllenatori);
@@ -263,27 +277,34 @@ namespace Fantacalcio
                             output = JsonConvert.SerializeObject(FantaCalciatori);
                         }
                         OperazioniFile operazioniFile = new OperazioniFile(); //Viene istanziata la classe OperazioniFile.
-                        string descrizioneErrore = operazioniFile.ScriviFile(percorsiIO[i], output);
-                        if (descrizioneErrore.StartsWith("ERRORE:"))
+                        string descrizioneErrore = operazioniFile.ScriviFile(percorsiFile[i], output); //Si prova a effettuare la scrittura del file indicato grazie a questo metodo, che poi ritorna un messaggio che indica se ci sono state eccezioni o meno.
+                        if (descrizioneErrore.StartsWith("ERRORE:")) //Se si è generata un'eccezione, quindi la striga inizia per "ERRORE:", allora vengono eseguite le seguenti istruzioni.
                         {
-                            Console.WriteLine(descrizioneErrore);
-                            break;
+                            Console.WriteLine(descrizioneErrore); //Viene visualizzato il messaggio di errore.
+                            chiusuraProgramma = true; //Viene consentito di uscire dal programma.
+                            break; //Il ciclo viene interrotto.
+                        }
+                        else if (i == 1)
+                        {
+                            Console.WriteLine(operazioniFile.ToString()); //Viene visualizzato un messaggio che indica il completamento corretto delle operazioni di salvataggio.
                         }
                     }
                     break;
                 case ("N"):
+                    chiusuraProgramma = true; //Viene consentito di uscire dal programma.
                     break;
             }
             Console.Clear(); //Elimina il contenuto della console.
+            return chiusuraProgramma;
         }
 
         //Metodo richiamato quando i dati iniziali sono stati configurati. Permette la visualizzazione di un menu di scelta tra le diverse funzionalità del programma.
         static private bool AvvioComune()  
         {
-            bool chiusuraProgramma = false;
+            bool chiusuraProgramma = false; //Variabile usata per determinare se consentire o meno all'utente l'uscita dal programma.
             bool ripetiCiclo; //Variabile necessaria per definire se continuare o meno l'iterazione dei cicli do-while.
 
-            //Visualizzazioni a schermo
+            //Serie di visualizzazioni a schermo
 
             Console.WriteLine($"                        Bentornato nel Fantacalcio. Oggi è il {DateTime.Now:dd/MM/yyyy}.\n" + //Nella stringa è contenuto il metodo DateTime.Now consente di ottenere la data corrente secondo lo schema giorno/mese/anno.
                               " Scegli una delle seguenti funzioni inserendo il corrispondente valore numerico per iniziare... ");
@@ -345,7 +366,7 @@ namespace Fantacalcio
             Console.Clear(); //Elimina il contenuto della console.
             VisualizzaIntestazione(); //Viene visualizzata a schermo l'intestazione "Programma gestionale del Fantacalcio".
             Console.WriteLine("                        Funzionalità di ricerca dei fanta-calciatori                       ");
-            Ricerca();
+            Ricerca(); //Si fa riferimento a questo metodo per eseguire la serie di richieste e visualizzazione a video che implicano la ricerca.
         }
 
         //Metodo che permette di visualizzare i dati sui fanta-allenatori.
@@ -375,9 +396,9 @@ namespace Fantacalcio
             VisualizzaIntestazione(); //Viene visualizzata a schermo l'intestazione "Programma gestionale del Fantacalcio".
             Console.WriteLine("                 Funzionalità di schieramento in campo dei fanta-calciatori                 ");
             OperazioniFile operazioniFile = new OperazioniFile(); //Viene istanziata la classe OperazioniFile.
-            bool verificaFile = operazioniFile.VerificaEsistenzaFile(percorsiIO[2]);
+            bool verificaFile = operazioniFile.VerificaEsistenzaFile(percorsiFile[2]); //Viene effettuato il controllo di esistenza del file che contiene i codici di schieramento.
             bool ripetiCiclo = false; //Variabile necessaria per definire se continuare o meno l'iterazione dei cicli do-while.
-            if (verificaFile == true)
+            if (verificaFile == true) //Se gli schieramenti esistono, allora vengono visualizzati a schermo.
             {
                 Console.WriteLine("\nOra verrà visualizzato lo schieramento di ogni fanta-allenatore");
                 //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
@@ -386,9 +407,39 @@ namespace Fantacalcio
                     SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
                     Console.WriteLine($"\nQuesto è lo schieramento di {FantaAllenatori[i].OttieniNome()}:");
                     SetResetColori(false); //Riporta i colori alle proprietà standard.
-                    for (int j = 0; j < CodiciSchieramenti.Count / (i + 1); j++)
+                    if (CodiciSchieramenti == null) //Se la lista è vuota, allora viene popolata.
+                    {
+                        string contenutoInput = operazioniFile.LeggiFile(percorsiFile[2]); //Avviene la lettura del file specificato.
+                        if (contenutoInput.StartsWith("ERRORE:")) //Se si è generata un'eccezione, quindi la striga inizia per "ERRORE:", allora vengono eseguite le seguenti istruzioni.
+                        {
+                            Console.WriteLine(contenutoInput); //Viene visualizzato il messaggio di errore.
+                            break; //Il ciclo si interrompe.
+                        }
+                        else
+                        {
+                            //Si effettua la deserializzazione del file, che divide i vari attributi presenti nei due file e vengono inseriti ordinatamente all'interno della rispettive liste.
+                            CodiciSchieramenti = JsonConvert.DeserializeObject<List<(int, int)>>(contenutoInput);
+                        }
+                    }
+                    //Ciclo for interno.
+                    for (int j = 0; j < CodiciSchieramenti.Count / (i + 1); j++) //Viene visualizzato lo schieramento.
                     {
                         Console.WriteLine($"{j + 1}) {FantaCalciatori[CodiciSchieramenti[j * (i + 1)].Item2].ToString()}");
+                    }
+                    Console.WriteLine("\nDesideri mantenere questi schieramenti, oppure vuoi cancellarli? (Inserisci \"S\" se SI, altrimenti inserisci \"N\")");
+                    if (RispostaSiNo() == "N")
+                    {
+                        Console.WriteLine("\nSalvataggio in corso...");
+                        string messaggioOutput = operazioniFile.EliminaFile(percorsiFile[2]);
+                        if (messaggioOutput.StartsWith("ERRORE:")) //Se si è generata un'eccezione, quindi la striga inizia per "ERRORE:", allora vengono eseguite le seguenti istruzioni.
+                        {
+                            Console.WriteLine(messaggioOutput); //Viene visualizzato il messaggio di errore.
+                            break; //Il ciclo si interrompe.
+                        }
+                        else
+                        {
+                            Console.WriteLine(operazioniFile.ToString()); //Viene visualizzato il messaggio di salvataggio effettuato con successo.
+                        }
                     }
                 }
             }
@@ -403,23 +454,23 @@ namespace Fantacalcio
                         SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
                         Console.WriteLine($"\nScegli il {j + 1}o fanta-calciatore da schierare per {FantaAllenatori[i].OttieniNome()}:");
                         SetResetColori(false); //Riporta i colori alle proprietà standard.
-                        bool aggiuntaGiocatore = Ricerca();
-                        if (aggiuntaGiocatore == true)
+                        bool aggiuntaGiocatore = Ricerca(); //Viene invocato il metodo di ricerca.
+                        if (aggiuntaGiocatore == true) //Se sono stati trovati dei risultati nella ricerca, allora chiede all'utente di scegliere il fanta-giocatore che vuole schierare.
                         {
                             Console.WriteLine("\nOra inserisci il giocatore che desideri inserire nel tuo schieramento:");
-                            int scelta;
+                            int scelta; //Identifica la scelta dell'utente.
                             //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
                             do
                             {
                                 scelta = int.Parse(Console.ReadLine()) - 1;
-                                if (scelta < 0 || scelta > Indici.Count)
+                                if (scelta < 0 || scelta > Indici.Count) //Avviene la verifica dell'inserimento di un fanta-calciatore che è stato effettivamente trovato dalla ricerca.
                                 {
                                     Console.WriteLine("\nNon hai inserito un valore accettabile. Riprova...");
                                     ripetiCiclo = false;
                                 }
                                 else
                                 {
-                                    CodiciSchieramenti.Add((i, j));
+                                    CodiciSchieramenti.Add((i, j)); //Metodo che aggiunge una posizione all'interno della lista CodiciSchieramenti.
                                     ripetiCiclo = true;
                                 }
 
@@ -444,53 +495,55 @@ namespace Fantacalcio
                         break;
                     }
                 }
-                if (ripetiCiclo == true)
+                if (ripetiCiclo == true) 
                 {
                     Console.WriteLine("\nGli schieramenti sono stati inseriti correttamenti. Desideri salvarli? (inserisci \"S\" se SI, altrimenti \"N\" se NO)");
                     if (RispostaSiNo() == "S")
                     {
                         Console.WriteLine("\nSalvataggio in corso...");
+                        //Viene effettuata la serializzazione della lista, la quale viene inserita in una stringa pronta per essere scritta su file.
                         string output = JsonConvert.SerializeObject(CodiciSchieramenti);
-                        string messaggioOutput = operazioniFile.ScriviFile(percorsiIO[2], output);
-                        if (messaggioOutput.StartsWith("ERRORE:"))
+                        string messaggioOutput = operazioniFile.ScriviFile(percorsiFile[2], output); //Avviene la scrittura su file.
+                        if (messaggioOutput.StartsWith("ERRORE:")) //Se si è generata un'eccezione, quindi la striga inizia per "ERRORE:", allora vengono eseguite le seguenti istruzioni.
                         {
-                            Console.WriteLine(messaggioOutput);
+                            Console.WriteLine(messaggioOutput); //Viene mostrato all'utente il messaggio di errore.
                         }
                         else
                         {
-                            Console.WriteLine(operazioniFile.ToString());
+                            Console.WriteLine(operazioniFile.ToString()); //Viene mostrato un messaggio di salvataggio effettuato correttamente.
                         }
                     }
                 }
             }
-        }
+        } 
 
-        //Metodo che permette di verificare la risposta di un utente in caso di una richiesta di salvataggio.
+        //Metodo che permette di effettuare l'inserimento e verificare la risposta di un utente nel caso in cui si richieda che sia "SI" o "NO".
         static private string RispostaSiNo()
         {
-            string scelta;
+            string scelta; //Variabile che contiene la scelta inserita dall'utente.
             bool ripetiCiclo; //Variabile necessaria per definire se continuare o meno l'iterazione dei cicli do-while.
+            //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
             do
             {
-                scelta = Console.ReadLine().ToUpper();
-                if (scelta != "S" && scelta != "N")
+                scelta = Console.ReadLine().ToUpper(); //Effettua la lettura dell'inserimento da tastiera dell'utente e lo rende automaticamente maiuscolo.
+                if (scelta != "S" && scelta != "N") //Se l'utente inserisce un valore diverso da "S" e "N", allora lo avvisa con un messaggio, e poi il ciclo viene ripetuto.
                 {
                     Console.WriteLine("\nNon hai inserito un valore accettabile. Riprova...");
-                    ripetiCiclo = false;
+                    ripetiCiclo = true;
                 }
                 else
                 {
-                    ripetiCiclo = true;
+                    ripetiCiclo = false;
                 }
 
-            } while (ripetiCiclo == false);
+            } while (ripetiCiclo == true);
             return scelta;
         }
 
         //Metodo che permette di visualizzare le richieste all'utente che porteranno all'aggiornamento delle statistiche dei fanta-calciatori.
         static private void SchermataAggiornamentoStatisticheFantaCalciatori() 
         {
-            string[] testoDaVisualizzare = new string[] { "la quotazione attuale", "il punteggio ottenuto nell'ultima partita" };
+            string[] testoDaVisualizzare = new string[] { "la quotazione attuale", "il punteggio ottenuto nell'ultima partita" }; //Testo che sarà visualizzato nelle richieste di inserimento delle nuove caratteristiche.
             bool ripetiCiclo = false; //Variabile necessaria per definire se continuare o meno l'iterazione dei cicli do-while.
             Console.Clear(); //Elimina il contenuto della console.
             VisualizzaIntestazione(); //Viene visualizzata a schermo l'intestazione "Programma gestionale del Fantacalcio".
@@ -499,16 +552,16 @@ namespace Fantacalcio
             //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
             do
             {
-                if (Ricerca() == true)
+                if (Ricerca() == true) //Solo se la ricerca ha dato uno o più risultati, allora viene richiesto all'utente di inserire il giocatore al quale vuole aggiornare le caratteristiche e successivamente chiede le più recenti caratteristiche.
                 {
-                    int sceltaFantaCalciatore;
+                    int sceltaFantaCalciatore; //Identifica la scelta di un fanta-calciatore da parte dell'utente.
                     //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
                     do
                     {
                         Console.WriteLine("\nInserisci il numero del giocatore a cui desideri aggiornare le statistiche:");
-                        ripetiCiclo = int.TryParse(Console.ReadLine(), out sceltaFantaCalciatore);
-                        sceltaFantaCalciatore--;
-                        if (sceltaFantaCalciatore < 0 || sceltaFantaCalciatore > Indici.Count || ripetiCiclo == false)
+                        ripetiCiclo = int.TryParse(Console.ReadLine(), out sceltaFantaCalciatore); //Questo metodo permette di verificare se è possibile o meno convertire una variabile stringa in input: restituisce true in caso positivo, altrimenti restituisce false.
+                        sceltaFantaCalciatore--; //Viene decrementato perché gli indici informatici partono sempre da 0.
+                        if (sceltaFantaCalciatore < 0 || sceltaFantaCalciatore > Indici.Count || ripetiCiclo == false)  //Viene effettuato il controllo che sia stato inserito un numero che corrisponda effettivamente a uno dei fanta-calciatori trovati dalla ricerca.
                         {
                             Console.WriteLine("\nNon hai inserito un valore accettabile. Riprova...");
                             ripetiCiclo = false;
@@ -525,39 +578,46 @@ namespace Fantacalcio
                         //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
                         do
                         {
-                            ripetiCiclo = int.TryParse(Console.ReadLine(), out datoAggiornato);
-                            if (ripetiCiclo == false || datoAggiornato < 0)
+                            ripetiCiclo = int.TryParse(Console.ReadLine(), out datoAggiornato); //Questo metodo permette di verificare se è possibile o meno convertire una variabile stringa in input: restituisce true in caso positivo, altrimenti restituisce false.
+                            if (ripetiCiclo == false || datoAggiornato < 0) //Viene controllato che vengano inseriti numeri maggiori o uguali a zero.
                             {
                                 Console.WriteLine("\nDevi inserire un numero maggiore o uguale a zero per questo campo. Riprova...");
                                 ripetiCiclo = false;
                             }
 
                         } while (ripetiCiclo == false);
-                        if (i == 0)
+                        if (i == 0) //Viene effettuata l'aggiornamento della quotazione attuale del fanta-calciatore selezionato.
                         {
                             FantaCalciatori[Indici[sceltaFantaCalciatore]].AggiornaQuotazioneAttuale(datoAggiornato);
                         }
-                        else
+                        else //Viene effettuata l'aggiornamento del punteggio del fanta-calciatore selezionato.
                         {
                             FantaCalciatori[Indici[sceltaFantaCalciatore]].AggiornaPunteggio(datoAggiornato);
                         }
                     }
+                    //Viene visualizzato il fanta-calciatore con i dati aggiornati e viene chiesto all'utente se desidera salvarlo o meno.
                     Console.WriteLine("\nEcco il fanta-calciatore che hai scelto con i nuovi dati inseriti:");
                     Console.WriteLine(FantaCalciatori[Indici[sceltaFantaCalciatore]].ToString());
                     Console.WriteLine("\nVuoi salvarlo? (inserisci \"S\" se SI, altrimenti \"N\" se NO)");
                     if (RispostaSiNo() == "S")
                     {
                         Console.WriteLine("\nSalvataggio in corso...");
+                        //Viene effettuata la serializzazione della lista, in modo che quest'ultima possa essere pronta per la scrittura su file.
                         string output = JsonConvert.SerializeObject(FantaCalciatori);
                         OperazioniFile operazioniFile = new OperazioniFile(); //Viene istanziata la classe OperazioniFile.
-                        string descrizioneErrore = operazioniFile.ScriviFile(percorsiIO[1], output);
-                        if (descrizioneErrore.StartsWith("ERRORE:"))
+                        string descrizioneErrore = operazioniFile.ScriviFile(percorsiFile[1], output); //Viene effettuata la scrittura su file.
+                        if (descrizioneErrore.StartsWith("ERRORE:")) //Se si è generata un'eccezione, quindi la striga inizia per "ERRORE:", allora vengono eseguite le seguenti istruzioni.
                         {
-                            Console.WriteLine(descrizioneErrore);
+                            Console.WriteLine(descrizioneErrore); //Viene visualizzato il messaggio di errore.
                             break;
+                        }
+                        else
+                        {
+                            Console.WriteLine(operazioniFile.ToString()); //Viene visualizzato il messaggio di salvataggio effettuato correttamente.
                         }
                     }
                 }
+                //Viene chiesto all'utente se desidera nuovamente cambiare le caratteristiche a un altro giocatore oppure se vuole tornare alla schermata iniziale.
                 SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
                 Console.WriteLine("\nVuoi riprovare a cercare un giocatore, oppure vuoi tornare alla schermata iniziale?\n(inserisci \"S\" se SI, altrimenti \"N\" se NO)");
                 SetResetColori(false); //Riporta i colori alle proprietà standard.
@@ -572,28 +632,46 @@ namespace Fantacalcio
         //Metodo che permette di visualizzare le richieste dei filtri di ricerca, ma anche i risultati della ricerca. 
         static private bool Ricerca()
         {
-            string[] testoDaVisualizzare = new string[] { "il nome", "il cognome", "la squadra", "il ruolo", "il numero di maglia", "la quotazione iniziale", "la quotazione attuale", "il punteggio in classifica" };
-            string[] giocatoreRicercato = new string[] { "", "", "", "", "0", "0", "0", "0" };
-            int contatoreFiltri = 0;
-            bool valoreRitornato;
+            string[] testoDaVisualizzare = new string[] { "il nome", "il cognome", "la squadra", "il ruolo", "il numero di maglia", "la quotazione iniziale", "la quotazione attuale", "il punteggio in classifica" }; //Contiene il testo da visualizzare durante la richiesta di filtri di ricerca.
+            string[] giocatoreRicercato = new string[] { "", "", "", "", "0", "0", "0", "0" }; //Conterrà le caratteristiche inserite dall'utente durante la ricerca.
+            int contatoreFiltri = 0; //Conta i filtri inseriti dall'utente nella ricerca.
+            bool risultati; //Indica con true che la ricerca ha prodotto almeno un risultato, altrimenti contiene false.
             //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
             for (int i = 0; i < testoDaVisualizzare.Length; i++)
             {
                 SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
                 Console.WriteLine($"\nInserisci {testoDaVisualizzare[i]} del fanta-calciatore che vuoi cercare:");
                 SetResetColori(false); //Riporta i colori alle proprietà standard.
-                giocatoreRicercato[i] = Console.ReadLine();
-                if (giocatoreRicercato[i] == "")
+                giocatoreRicercato[i] = Console.ReadLine(); //Viene effettuata la lettura del filtro.
+                if (giocatoreRicercato[i] == "") //Se non si inserisce nulla, allora la richiesta dei filtri viene terminata.
                 {
-                    break;
+                    if (i > 3) //Nel caso in cui il filtro che viene saltato richieda un'informazione numerica, allora viene reimpostato il valore della stringa "0" in modo che non sorgano problemi nella conversione stringa-integer.
+                    {
+                        giocatoreRicercato[i] = "0";
+                    }
+                    break; //Il ciclo viene terminato.
                 }
                 else
                 {
-                    contatoreFiltri++;
+                    if (i > 3) //Nel caso in cui il filtro che viene saltato richieda un'informazione numerica, allora viene effettuato un controllo preventivo.
+                    {
+                        //Si prova a fare la conversione stringa-integer e il controllo che il numero inserito sia maggiore di zero: se ci sono degli errori, allora l'utente viene avvisato e si procede a fargli compiere nuovamente l'inserimento.
+                        if (int.TryParse(giocatoreRicercato[i], out int verificaInteger) == false || verificaInteger < 0) 
+                        {
+                            Console.WriteLine("\nDevi inserire un numero maggiore di zero. Riprova...");
+                            i--;
+                        }
+                    }
+                    else //Se non ci sono errori, si conta un filtro inserito in più.
+                    {
+                        contatoreFiltri++;
+                    }
                 }
             }
+            //Viene istanziata la classe FantaCalciatore e viene passato al metodo costruttore i filtri di ricerca inseriti dall'utente riguardo al fanta-calciatore.
             FantaCalciatore fantaCalciatore = new FantaCalciatore(giocatoreRicercato[0], giocatoreRicercato[1], giocatoreRicercato[2], giocatoreRicercato[3], int.Parse(giocatoreRicercato[4]), int.Parse(giocatoreRicercato[5]), int.Parse(giocatoreRicercato[6]), int.Parse(giocatoreRicercato[7]), 0);
-            Indici = fantaCalciatore.RicercaFantaCalciatore(FantaCalciatori, contatoreFiltri);
+            Indici = fantaCalciatore.RicercaFantaCalciatore(FantaCalciatori, contatoreFiltri); //Gli indici degli elementi che corrispondono ai filtri di ricerca ritornati dal metodo RicercaFantaCalciatore vengono inseriti nella lista Indici.
+            //Visualizzazione a schermo dei risultati di ricerca.
             if (Indici.Count > 0)
             {
                 SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
@@ -607,32 +685,32 @@ namespace Fantacalcio
                 }
                 SetResetColori(false); //Riporta i colori alle proprietà standard.
                 Console.WriteLine("Di seguito verrà riportato l'elenco dei risultati con nome, cognome, squadra, ruolo, numero di maglia, quotazione iniziale, quotazione attuale, punteggio in classifica e proprietario del fanta-calciatore\n");
-                valoreRitornato = true;
+                risultati = true;
             }
             else
             {
                 SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
                 Console.WriteLine("\nLa ricerca non ha prodotto risultati...");
                 SetResetColori(false); //Riporta i colori alle proprietà standard.
-                valoreRitornato = false;
-            }
-            int multipliDiciassete = 1;
+                risultati = false; 
+            } 
+            int multipliDiciassete = 1; //Contatore necessario successivamente per evitare di visualizare troppi risultati (in questo caso più dei multipli di diciassette) nello stesso momento, rendendo più agile la lettura da parte dell'utente.
             //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
-            for (int i = 0; i < Indici.Count; i++)
+            for (int i = 0; i < Indici.Count; i++) //Visualizzazione a schermo dei fanta-calciatori trovati dalla ricerca.
             {
                 Console.WriteLine($"{i + 1}) {FantaCalciatori[Indici[i]].ToString()} {FantaAllenatori[FantaCalciatori[Indici[i]].OttieniCodiceRosa()].OttieniNome()}");
                 if (i == 17 * multipliDiciassete)
                 {
                     multipliDiciassete++;
                     Console.WriteLine("\nPremi invio per visualizzare ulteriori risultati...\n");
-                    Console.ReadKey();
+                    Console.ReadKey(); //Metodo che permette di acquisire la pressione di un tasto qualsiasi da parte dell'utente.
                 }
                 else if (i == FantaCalciatori.Count - 1)
                 {
                     Console.WriteLine("\n ===================  Fine dei risultati  =================== ");
                 }
             }
-            return valoreRitornato;
+            return risultati;
         }
 
         //Metodo che consente la visualizzazione della classifica dei fanta-calciatori.
@@ -642,21 +720,21 @@ namespace Fantacalcio
             VisualizzaIntestazione(); //Viene visualizzata a schermo l'intestazione "Programma gestionale del Fantacalcio".
             Console.WriteLine("            Funzionalità di visualizzazione della classifica dei fanta-calciatori            ");
             Console.WriteLine("\n  Di seguito verrà visualizzata la classifica ordinata in modo crescente in base al punteggio.  ");
-            FantaCalciatore fantaCalciatore = new FantaCalciatore("", "", "", "", 0, 0, 0, 0, 0);
-            List<FantaCalciatore> FantaCalciatoriOrdinati = fantaCalciatore.OrdinaFantaCalciatori(FantaCalciatori);
+            FantaCalciatore fantaCalciatore = new FantaCalciatore("", "", "", "", 0, 0, 0, 0, 0); //Viene istanziata la classe FantaCalciatore.
+            List<FantaCalciatore> FantaCalciatoriOrdinati = fantaCalciatore.OrdinaFantaCalciatori(FantaCalciatori); //Avviene l'ordinamento della lista di fanta-calciatori in base al loro punteggio attraverso il metodo OrdinaFantaCalciatori; il valore restituito viene inserito all'interno di una nuova lista.
             SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
             Console.WriteLine("\n                                    =========================                                      \n");
             SetResetColori(false); //Riporta i colori alle proprietà standard.
-            int multipliNove = 1;
+            int multipliNove = 1; //Contatore necessario successivamente per evitare di visualizare troppi risultati (in questo caso più dei multipli di nove) nello stesso momento, rendendo più agile la lettura da parte dell'utente.
             //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
-            for (int i = 0; i < FantaCalciatoriOrdinati.Count; i++)
+            for (int i = 0; i < FantaCalciatoriOrdinati.Count; i++) //Viene effettuata la visualizzazione della classifica.
             {
                 Console.WriteLine($"{i + 1}) {FantaCalciatoriOrdinati[i].ToString()}");
                 if (i == 9 * multipliNove && i != FantaCalciatoriOrdinati.Count - 1)
                 {
                     multipliNove++;
                     Console.WriteLine("\nPremi invio per visualizzare ulteriori risultati...");
-                    Console.ReadKey();
+                    Console.ReadKey(); //Metodo che permette di acquisire la pressione di un tasto qualsiasi da parte dell'utente.
                 }
             }
         }
@@ -664,43 +742,23 @@ namespace Fantacalcio
         //Metodo che visualizza le richieste a video che poi porteranno o meno alla cancellazione dei dati del fanta-torneo. Restituisce un valore 
         static private bool SchermataCancellazioneDati() 
         {
-            bool ripetiCiclo; //Variabile necessaria per definire se continuare o meno l'iterazione dei cicli do-while.
-            bool chiusuraProgramma = false;
+            bool chiusuraProgramma = false; //Variabile usata per determinare se consentire o meno all'utente l'uscita dal programma.
             Console.Clear(); //Elimina il contenuto della console.
             VisualizzaIntestazione(); //Viene visualizzata a schermo l'intestazione "Programma gestionale del Fantacalcio".
-
-            //Visualizzazioni a schermo.
-
+            //Serie di visualizzazioni a schermo.
             Console.WriteLine("                 Funzionalità di cancellazione dei dati del fanta-torneo                 ");
             Console.WriteLine("\n          Grazie a questa funzionalità sei in grado di eliminare qualsiasi dato\n                  del fanta-torneo e inserire delle informazioni nuove.");
             SetResetColori(true); //Cambia i colori secondo le proprietà del metodo.
             Console.WriteLine("\nSei sicuro di voler eliminare tutti i dati inseriti del fanta-torneo?\n(inserisci \"S\" se SI, altrimenti inserisci \"N\" se NO)");
             SetResetColori(false); //Riporta i colori alle proprietà standard.
-
-            string scelta; //Variabile in cui verrà inserita la scelta dell'utente.
-            //Qui inizia un ciclo do-while, in cui le istruzioni contenute all'interno vengono eseguite almeno una volta; se la condizione finale è soddisfatta, allora il ciclo continua e le istruzioni interne vengono ripetute, altrimenti si ferma.
-            do
-            {
-                scelta = Console.ReadLine().ToUpper(); //Viene acquisito l'input da tastiera, viene reso tutto maiuscolo e inserito nella stringa scelta.
-                if (scelta != "S" && scelta != "N") //La variabile scelta non può assumere valori diversi da "S" e "N", pertanto si segnala l'errore all'utente se lo commette e il ciclo si ripete.
-                {
-                    Console.WriteLine("\nNon hai inserito un valore corretto. Riprova...");
-                    ripetiCiclo = false;
-                }
-                else 
-                {
-                    ripetiCiclo = true;
-                }
-
-            } while (ripetiCiclo == false);
-            if (scelta == "S") //Se l'utente decide di salvare, allora vengono eseguite le seguenti istruzioni.
+            if (RispostaSiNo() == "S") //Se l'utente decide di salvare, allora vengono eseguite le seguenti istruzioni.
             {
                 Console.WriteLine("\nSalvataggio delle modifiche in corso..."); //Visualizzazione a schermo.
                 //Inizia un ciclo for, in cui un ciclo si ripete fino a quando una variabile non assume un determinato valore. La variabile ad ogni ciclo viene aumentata.
-                for (int i = 0; i < percorsiIO.Length; i++)
+                for (int i = 0; i < percorsiFile.Length; i++)
                 {
                     OperazioniFile operazioniFile = new OperazioniFile(); //Viene istanziata la classe OperazioniFile.
-                    string messaggioOutput = operazioniFile.EliminaFile(percorsiIO[i]); //Si richiama il metodo EliminaFile per effettuare l'eliminazione del file indicato da percorsiIO[i]. 
+                    string messaggioOutput = operazioniFile.EliminaFile(percorsiFile[i]); //Si richiama il metodo EliminaFile per effettuare l'eliminazione del file indicato da percorsiFile[i]. 
                     if (messaggioOutput.StartsWith("ERRORE:")) //Se si è verificata un'eccezione, quindi il messaggio in output inizia per "ERRORE:" allora avviene la visualizzazione a schermo di tale errore.
                     {
                         Console.WriteLine(messaggioOutput);
@@ -708,7 +766,7 @@ namespace Fantacalcio
                     }
                     if (i == 2)
                     {
-                        Console.WriteLine(operazioniFile.ToString());
+                        Console.WriteLine(operazioniFile.ToString()); //Viene visualizzato il messaggio di salvataggio eseguito correttamente.
                     }
                 }
                 //Attraverso il metodo List.Clear() si effettua l'eliminazione di ogni elemento presente nella lista.
@@ -716,14 +774,15 @@ namespace Fantacalcio
                 FantaCalciatori.Clear();
                 Indici.Clear();
                 CodiciSchieramenti.Clear();
+                chiusuraProgramma = true;
             }
             return chiusuraProgramma;
         }
 
-        //Metodo che permette di cambiare i colori dei caratteri e dello sfondo, oppure di farli tornare alle proprietà standard. 
-        static public void SetResetColori(bool controllo)
+        //Metodo che permette di cambiare i colori dei caratteri e dello sfondo, oppure di farli tornare alle proprietà standard in base al valore boolenano fornito come argomento. 
+        static public void SetResetColori(bool setReset)
         {
-            if (controllo == true)
+            if (setReset == true)
             {
                 Console.BackgroundColor = ConsoleColor.DarkGreen; //Metodo che definisce il colore dello sfondo.
                 Console.ForegroundColor = ConsoleColor.White; //Metodo che definisce il colore del testo.
