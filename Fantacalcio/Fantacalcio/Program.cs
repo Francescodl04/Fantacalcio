@@ -579,7 +579,7 @@ namespace Fantacalcio
                         do
                         {
                             ripetiCiclo = int.TryParse(Console.ReadLine(), out datoAggiornato); //Questo metodo permette di verificare se è possibile o meno convertire una variabile stringa in input: restituisce true in caso positivo, altrimenti restituisce false.
-                            if (ripetiCiclo == false || datoAggiornato < 0) //Viene controllato che vengano inseriti numeri maggiori o uguali a zero.
+                            if (ripetiCiclo == false || (datoAggiornato < 0 && i == 0)) //Viene controllato che vengano inseriti numeri maggiori o uguali a zero.
                             {
                                 Console.WriteLine("\nDevi inserire un numero maggiore o uguale a zero per questo campo. Riprova...");
                                 ripetiCiclo = false;
@@ -1110,6 +1110,10 @@ namespace Fantacalcio
         public int AggiornaPunteggio(int punteggioPartita)
         {
             punteggioClassifica += punteggioPartita;
+            if (punteggioClassifica < 0) //Se risulta un punteggio minore di zero, che non può esistere, allora il punteggio viene posto uguale a zero.
+            {
+                punteggioClassifica = 0;
+            }
             return punteggioClassifica;
         }
 
