@@ -25,9 +25,9 @@ namespace Fantacalcio
 
         //Liste necessarie per contenere ogni dato del fanta-torneo.
         static private List<FantaAllenatore> FantaAllenatori = new List<FantaAllenatore>(); //Lista che conterrà gli attri dei fanta-allenatori.
-        static private List<FantaCalciatore> FantaCalciatori = new List<FantaCalciatore>(); //Lista che conterrà i dati dei fanta-allenatori.
-        static private List<(int, int)> CodiciSchieramenti = new List<(int, int)>(); //Lista che conterrà i dati dei fanta-allenatori.
-        static private List<int> Indici = new List<int>(); //Lista che conterrà i dati dei fanta-allenatori.
+        static private List<FantaCalciatore> FantaCalciatori = new List<FantaCalciatore>(); //Lista che conterrà i dati dei fanta-calciatori.
+        static private List<(int, int)> CodiciSchieramenti = new List<(int, int)>(); //Lista che conterrà gli indici nella lista FantaCalciatori dei fanta-calciatori schierati insieme al codice della rosa di cui fanno parte.
+        static private List<int> Indici = new List<int>(); //Lista che conterrà gli indici nella lista FantaCalciatori dei fanta-calciatori che sono stati trovati da una ricerca.
 
         //Metodi
 
@@ -369,7 +369,7 @@ namespace Fantacalcio
             Ricerca(); //Si fa riferimento a questo metodo per eseguire la serie di richieste e visualizzazione a video che implicano la ricerca.
         }
 
-        //Metodo che permette di visualizzare i dati sui fanta-allenatori.
+        //Metodo che permette di visualizzare i dati dei fanta-allenatori.
         static public void SchermataVisualizzazioneFantaAllenatori()  
         {
             Console.Clear(); //Elimina il contenuto della console.
@@ -389,7 +389,7 @@ namespace Fantacalcio
             SetResetColori(false); //Riporta i colori alle proprietà standard.
         }
 
-        //Metodo che permette di visualizzare la prima parte della schermata di ricerca dei fanta-calciatori e poi l'inserimento di ogni giocatore in uno schieramento
+        //Metodo che permette di creare o visualizzare gli schieramenti in campo dei fanta-calciatori.
         static private void SchermataSchieramentoCampoFantaCalciatori() 
         {
             Console.Clear(); //Elimina il contenuto della console.
@@ -517,7 +517,7 @@ namespace Fantacalcio
             }
         } 
 
-        //Metodo che permette di effettuare l'inserimento e verificare la risposta di un utente nel caso in cui si richieda che sia "SI" o "NO".
+        //Metodo che permette di effettuare l'inserimento e verificare la risposta di un utente nel caso in cui si richieda che sia "S" o "N".
         static private string RispostaSiNo()
         {
             string scelta; //Variabile che contiene la scelta inserita dall'utente.
@@ -739,7 +739,7 @@ namespace Fantacalcio
             }
         }
 
-        //Metodo che visualizza le richieste a video che poi porteranno o meno alla cancellazione dei dati del fanta-torneo. Restituisce un valore 
+        //Metodo che visualizza le richieste a video che poi porteranno o meno alla cancellazione dei dati del fanta-torneo.
         static private bool SchermataCancellazioneDati() 
         {
             bool chiusuraProgramma = false; //Variabile usata per determinare se consentire o meno all'utente l'uscita dal programma.
